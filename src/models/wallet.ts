@@ -5,10 +5,10 @@ import { ModelBase } from "./base";
  * @export
  */
 export type Wallet = ModelBase & {
-  readonly amount: Amount; // virtual field
-  readonly username: string;
-  readonly entityId: string;
-  readonly status: WalletStatus;
+  readonly amount: Amount // virtual field
+  readonly username: string
+  readonly entityId: string
+  readonly status: WalletStatus
 };
 
 export enum WalletStatus {
@@ -18,8 +18,8 @@ export enum WalletStatus {
 }
 
 export type Amount = {
-  readonly amount: number; // virtual field
-  readonly offset: string;
-  readonly calculetedIn: DateTime;
+  readonly amount: number // virtual field
+  readonly offset: string
+  readonly calculetedIn: DateTime
   // getAmount() takes the amount from ksql
 };
