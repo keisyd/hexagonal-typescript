@@ -1,0 +1,62 @@
+    {
+    "env": {
+        "es2021": true,
+        "node": true,
+        "jest": true
+    },
+    "extends": [
+        "standard",
+        "plugin:functional/external-recommended",
+        "plugin:functional/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "functional"
+    ],
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error"],
+      "@typescript-eslint/member-delimiter-style": ["error", {
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }],
+      "functional/no-try-statement": [ "off" ],
+      "functional/no-expression-statement": ["error", {
+        "ignorePattern": ["logger", "AWSConfig", ".use", ".on", ".listen"]
+      }],
+      "functional/no-conditional-statement": ["error", {
+        "allowReturningBranches": true
+      }],
+      "functional/functional-parameters": [ "off" ],
+      "functional/no-return-void": [ "off" ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.spec.ts"
+        ],
+        "env": {
+          "jest": true
+        },
+        "rules": {
+          "functional/functional-parameters": "off",
+          "functional/no-conditional-statement": "off",
+          "functional/no-expression-statement": "off"
+        }
+      }
+    ],
+    "ignorePatterns": [
+      "dist"
+    ]
+}
