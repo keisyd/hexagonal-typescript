@@ -70,6 +70,14 @@ const appConfig = {
   todo: {
     tableName: getEnv('AWS_DYNAMO_TODO_TABLE_NAME', 'todos'),
     queueUrl: getEnv('AWS_SQS_TODO_QUEUE_NAME', 'todo')
+  },
+  Wallet: {
+    tableName: "wallets",
+    queueUrl: getEnv('AWS_SQS_TODO_QUEUE_NAME', 'todo')
+  },
+  Transaction: {
+    tableName: "transactions",
+    queueUrl: getEnv('AWS_SQS_TODO_QUEUE_NAME', 'todo')
   }
 }
 

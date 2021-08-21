@@ -1,13 +1,16 @@
-import { root } from "@business";
+import { root, toISOString } from "@business";
 import { nullCheck } from "@utils";
 import Joi from "joi";
 import {
-  Transfer, Transaction, OperationType, Service, Debit, Credit
+  Transfer, Transaction, OperationType, Service, Debit, Credit, TransactionStatus
 } from "../models";
-import { credit, validateCredit } from "./credit";
-import { debit, validateDebit } from "./debit";
+import { validateCredit } from "./credit";
+import { validateDebitRequest } from "./debit";
+import { v4 as uuidv4 } from "uuid";
 import { validateSchema } from "./schema";
-import { transactionForTransfer } from "./transaction";
+import { validateTransaction } from "./transaction";
+
+const namespace:string = `${root}.transfer`
 
 const Transfer = Joi.object<Transfer>({
   originID: Joi.string().required(),
@@ -15,8 +18,6 @@ const Transfer = Joi.object<Transfer>({
   amount: Joi.number().integer().min(0),
   service: Joi.string().invalid([Service.DEPOSIT,Service.WITHDRAW]).valid(...Object.values(Service)),
 });
-
-const namespace:string = `${root}.transfer`
 
 /**
  * @description Validate a Transfer event on creating and return a transaction
@@ -58,7 +59,7 @@ export const validateTransfer = (
     operation:OperationType.DEBIT
   }
 
-  const transaction: Transaction = validateDebit(debitRequest);
+  const transaction: Transaction = validateDebitRequest(debitRequest);
 
   return [debitRequest, transaction];
 };
@@ -86,4 +87,36 @@ export const validateTransfer = (
   const transaction: Transaction = validateCredit(creditRequest);
 
   return [creditRequest, transaction];
+};
+
+
+/**
+ * @description Create a Transaction for a Credit Operation
+ * @function
+ * @param {Credit} [data] input data for create task
+ * @returns {Transaction}
+ */
+ export const transactionForTransfer = (
+  data: Transfer
+  ): Transaction => {
+  const methodPath = `${namespace}.transactionForTransfer`;
+
+  const createdAt = toISOString();
+
+  const updatedAt = createdAt;
+
+  const transaction: Transaction = {
+    // default values if is missing
+    ...data,
+    operation: OperationType.TRANSFER,
+    status:TransactionStatus.PENDING,
+    createdAt,
+    updatedAt,
+    // information from system
+    id: uuidv4(),
+  };
+
+  validateTransaction(transaction);
+
+  return transaction;
 };

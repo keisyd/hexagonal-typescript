@@ -1,11 +1,14 @@
 import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
-import { Debit } from "@models";
+import { Debit, Transaction, Wallet } from "@models";
 import { EClassError, throwCustomError } from "@utils";
-import { validateUpdateTodo, validateDeleteTodo } from "@business/debit";
 import { LoggerInstance } from "@ports/logger";
+import { transactionForDebit, validateDebit, validateDebitRequest, validateTransaction } from "@business";
+import { root, AdapterFacade } from "@adapters";
 
-export type TransferAdapterInstance = {
-  readonly debit: (id: Debit) => Promise<Debit | null>;
+const namespace:string = `${root}.debit`
+
+export type DebitAdapterInstance = {
+  readonly debit: (id: Wallet) => Promise<Debit | null>;
 };
 
 /**
@@ -13,13 +16,13 @@ export type TransferAdapterInstance = {
  * @memberof adapters
  * @function
  * @param {LoggerInstance} logger instance of logger
- * @param {DynamoRepositoryInstance<Todo>} repository Dynamo database methods
+ * @param {DynamoRepositoryInstance<Wallet>} repository Dynamo database methods
  */
 const todoAdapterFactory = (
   logger: LoggerInstance,
-  repository: DynamoRepositoryInstance<Transfer>
-): TransferAdapterInstance => ({
-  transfer: transfer(repository),
+  repository: DynamoRepositoryInstance<Wallet>,
+): DebitAdapterInstance => ({
+  debit: debit(repository),
 });
 
 export default todoAdapterFactory;
@@ -30,19 +33,23 @@ export default todoAdapterFactory;
  * @function
  * @param {DynamoRepositoryInstance<Todo>} repository - Dynamo database methods.
  */
-const transfer = (repository: DynamoRepositoryInstance<Transfer>) => async (
-  id: string
+const debit = (
+  logger: LoggerInstance,
+  adapter: AdapterFacade
+) => (repository: DynamoRepositoryInstance<Wallet>) => async (
+  debitRequest: Debit
 ) => {
-  const methodPath = "adapters.balance-operations.transfer";
-  /// @adpater buscareVerificarEBloquear 1 (withdraw)
+  const methodPath = `${namespace}.transfer`;
 
-  /// @adpater buscarVerificar 2 (deposit)
-
-  /// business validarTransfer(1, 2)
-
-  /// enviar para outra carteira
   try {
+    const transaction:Transaction = validateDebitRequest(debitRequest);
+
+
+
+    adapter.transaction.createTransaction(transaction);
+
     const result = await repository.getDocument({ id });
+
     return result.value;
   } catch (error) {
     return throwCustomError(error, methodPath, EClassError.INTERNAL);

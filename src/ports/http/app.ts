@@ -1,6 +1,6 @@
 import { adapter } from '@adapters'
 import { appConfig, AWSDynamoConfig } from '@config'
-import { Todo } from '@models'
+import { Todo, Transaction, Wallet } from '@models'
 import { databaseRepository } from '@ports/aws-dynamo'
 import { handleLogger } from '@ports/logger'
 import { config as AWSConfig, DynamoDB } from 'aws-sdk'
@@ -18,7 +18,9 @@ const dynamo = new DynamoDB.DocumentClient()
 
 // inject repositories
 const databaseRepoInstance = databaseRepository<Todo>(dynamo, appConfig.todo.tableName)
-const adapterInstance = adapter(logger, databaseRepoInstance)
+const wallets = databaseRepository<Wallet>(dynamo, appConfig.Wallet.tableName)
+const transactions = databaseRepository<Transaction>(dynamo, appConfig.Transaction.tableName)
+const adapterInstance = adapter(logger, databaseRepoInstance, transactions, wallets)
 
 app.use(expressJson({ limit: '50mb' }))
 app.use(expressUrlEncoded({ extended: false }))

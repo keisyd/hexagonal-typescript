@@ -1,9 +1,7 @@
 import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
 import { Withdraw } from "@models";
 import { EClassError, throwCustomError } from "@utils";
-import { validateUpdateTodo, validateDeleteTodo } from "@business/withdraw";
 import { LoggerInstance } from "@ports/logger";
-import {} from "@models/withdraw";
 
 export type withdrawAdapterInstance = {
   readonly withdraw: (id: string) => Promise<withdraw | null>;

@@ -1,7 +1,6 @@
 import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
 import { Transfer } from "@models";
 import { EClassError, throwCustomError } from "@utils";
-import { validateUpdateTodo, validateDeleteTodo } from "@business/transfer";
 import { LoggerInstance } from "@ports/logger";
 import {} from "@models/transfer";
 
