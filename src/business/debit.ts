@@ -1,11 +1,11 @@
-import { root, toISOString, validateSuccessTransaction, validateTransaction } from "@business"
+import { root, toISOString, validateSuccessTransaction } from "@business"
 import { EClassError, nullCheck, throwCustomError } from "@utils"
 import Joi from "joi"
 import {
   OperationRequest, OperationType, Service, Transaction, TransactionStatus,
 } from "@models"
-import { v4 as uuidv4 } from "uuid"
 import { validateSchema } from "./schema"
+import { ServiceRequester } from "@models/service-requester"
 
 const namespace: string = `${root}.debit`
 
@@ -15,7 +15,45 @@ export const debitRequestSchema = Joi.object<OperationRequest>({
   amount: Joi.number().integer().min(0).required(),
   serviceOrigin: Joi.string().invalid(...Object.values(Service.DEPOSIT)).valid(...Object.values(Service)).required(),
   operation: Joi.string().valid(...Object.values(OperationType.DEBIT)).required(),
+  requester: Joi.string().invalid(...Object.values([ServiceRequester.DEPOSIT, ServiceRequester.ATOM])).valid(...Object.values(ServiceRequester)).required(),
+  token: Joi.string().required(),
 })
+
+/**
+ * @description Takes the debit request and the last Transaction on
+ * the wallet then returns a Debited Transaction
+ * @function
+ * @param {OperationRequest} [data] the debit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
+ * @returns {Transaction}
+ */
+export const createDebitTransaction = (
+  data: OperationRequest,
+  lastTransaction: Transaction
+): Transaction => {
+  const methodPath = `${namespace}.createDebitTransaction`
+
+  data = validateDebitRequest(data, lastTransaction)
+
+  ///Todo: Should I validate the lastTransaction?
+
+  const transaction: Transaction = {
+    // default values if is missing
+    walletId: lastTransaction.walletId,
+    destinationId: data.destinationId,
+    originId: data.originId,
+    operation: OperationType.DEBIT,
+    serviceOrigin: data.serviceOrigin,
+    status: TransactionStatus.SUCCESS,
+    amount: debit(lastTransaction.amount, data.amount),
+    previousAmount: lastTransaction.amount,
+    amountTransacted: data.amount,
+    walletStatus: lastTransaction.walletStatus,
+    transactionTime: toISOString()
+  }
+
+  return validateSuccessTransaction(transaction, methodPath)
+}
 
 /**
  * @description Validate debit Request
@@ -47,42 +85,6 @@ export const validateDebitRequest = (
       EClassError.USER_ERROR
     )
   }
-}
-
-/**
- * @description Takes the debit request and the last Transaction on
- * the wallet then returns a Debited Transaction
- * @function
- * @param {OperationRequest} [data] the debit request
- * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
- * @returns {Transaction}
- */
-export const createDebitTransaction = (
-  data: OperationRequest,
-  lastTransaction: Transaction
-): Transaction => {
-  const methodPath = `${namespace}.createDebitTransaction`
-
-  data = validateDebitRequest(data, lastTransaction)
-
-  ///Todo: Should I validate the lastTransaction?
-
-  const transaction: Transaction = {
-    // default values if is missing
-    walletId: lastTransaction.walletId,
-    destinationId: data.destinationId, //!TODO: Insert a defatult from env
-    originId: data.originId,
-    operation: OperationType.DEBIT,
-    serviceOrigin: data.serviceOrigin,
-    status: TransactionStatus.SUCCESS,
-    amount: debit(lastTransaction.amount, data.amount),
-    previousAmount: lastTransaction.amount,
-    amountTransacted: data.amount,
-    walletStatus: lastTransaction.walletStatus,
-    transactionTime: toISOString()
-  }
-
-  return validateSuccessTransaction(transaction)
 }
 
 /**

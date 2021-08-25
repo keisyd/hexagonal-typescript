@@ -1,3 +1,4 @@
+import { TransactionStatus, WalletStatus } from "@models"
 import { OperationType, Service } from "./operations"
 /**
  * @description The debit object
@@ -66,24 +67,5 @@ export type Transaction = {
   readonly status: TransactionStatus
 }
 
-/**
- * @description
- * Status da transação,
- * representando o estágio
- * de processamento da operação.
- */
-export enum TransactionStatus {
-  SUCCESS = "SUCCESS",
-  FAIL = "FAIL",
-}
-/**
- * @description
- * Status da carteira, para determinar
- * se estar habilitada ou não a proceder
- * a operação
- */
-export enum WalletStatus {
-  VALIDATED = "VALIDATED",
-  BLOCKED = "BLOCKED",
-  IN_VALIDATION = "IN_VALIDATION",
-}
+
+

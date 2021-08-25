@@ -7886,6 +7886,11 @@
   "resolved" "https://registry.npmjs.org/jwt-decode/-/jwt-decode-3.1.2.tgz"
   "version" "3.1.2"
 
+"jwt-simple@^0.5.6":
+  "integrity" "sha512-40aUybvhH9t2h71ncA1/1SbtTNCVZHgsTsTgqPUxGWDmUDrXyDf2wMNQKEbdBjbf4AI+fQhbECNTV6lWxQKUzg=="
+  "resolved" "https://registry.npmjs.org/jwt-simple/-/jwt-simple-0.5.6.tgz"
+  "version" "0.5.6"
+
 "kafka-node@^5.0.0":
   "integrity" "sha512-dD2ga5gLcQhsq1yNoQdy1MU4x4z7YnXM5bcG9SdQuiNr5KKuAmXixH1Mggwdah5o7EfholFbcNDPSVA6BIfaug=="
   "resolved" "https://registry.npmjs.org/kafka-node/-/kafka-node-5.0.0.tgz"

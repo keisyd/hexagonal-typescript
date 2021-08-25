@@ -1,4 +1,5 @@
 import { OperationType, Service } from "./operations"
+import { ServiceRequester } from "./service-requester"
 
 /**
  * @description The final user Transfer
@@ -6,32 +7,42 @@ import { OperationType, Service } from "./operations"
  */
 export type OperationRequest = {
   /**
-* @description
-* Id da carteira que sofrerá
-* subtração do valor transacionado
-*/
+  * @description
+  * Id da carteira que sofrerá
+  * subtração do valor transacionado
+  */
   readonly originId: string
   /**
- * @description
- * Id da carteira que sofrerá
- * adição do valor transacionado
- */
+   * @description
+   * Id da carteira que sofrerá
+   * adição do valor transacionado
+   */
   readonly destinationId: string
   /**
- * @description
- * Valor transacionado
- */
+   * @description
+   * Valor transacionado
+   */
   readonly amount: number
   /**
- * @description
- * Serviço UUDI que dá origem (justificativa) para a transação
- */
+   * @description
+   * Serviço UUDI que dá origem (justificativa) para a transação
+   */
   readonly serviceOrigin: Service
   /**
- * @description
- * Tipo de operação atômica crédito ou débito
- */
+   * @description
+   * Tipo de operação atômica crédito ou débito
+   */
   readonly operation: OperationType
+  /**
+   * @description
+   * Tipo de operação atômica crédito ou débito
+   */
+  readonly requester: ServiceRequester
+  /**
+    * @description
+    * Tipo de operação atômica crédito ou débito
+    */
+  readonly token: string
 }
 
 

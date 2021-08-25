@@ -1,122 +1,37 @@
-import { root, toISOString } from "@business"
-import { nullCheck } from "@utils"
-import Joi from "joi"
+import { generateToken, root } from "@business"
 import {
-  Transfer, Transaction, OperationType, Service, Debit, Credit, TransactionStatus
-} from "../models"
-import { validateCredit } from "./credit"
+  OperationRequest, OperationType, Transaction
+} from "@models"
+import { ServiceRequester } from "@models/service-requester"
+import { validateCreditRequest } from "./credit"
 import { validateDebitRequest } from "./debit"
-import { v4 as uuidv4 } from "uuid"
-import { validateSchema } from "./schema"
-import { validateTransaction } from "./transaction"
+import { validateSuccessTransaction } from "./transaction"
 
-const namespace: string = `${root}.transfer`
-
-const Transfer = Joi.object<Transfer>({
-  originID: Joi.string().required(),
-  destinationID: Joi.string().required(),
-  amount: Joi.number().integer().min(0),
-  service: Joi.string().invalid([Service.DEPOSIT, Service.WITHDRAW]).valid(...Object.values(Service)),
-})
+const namespace: string = `${root}.trasnfer`
 
 /**
- * @description Validate a Transfer event on creating and return a transaction
+ * @description Creates a credit request for the
+ * secont stage of transfer that is the
  * @function
- * @param {Transfer} [TransferRequest] input data for create Transfer operation
+ * @param {OperationRequest} [data] the debit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
  * @returns {Transaction}
  */
-export const validateTransfer = (
-  TransferRequest: Transfer,
-): Transaction => {
-  const methodPath = `${namespace}.validateTransfer`
+export const createCreditRequest = (
+  data: OperationRequest,
+  debitTransaction: Transaction
+): OperationRequest => {
+  const methodPath = `${namespace}.createDebitTransaction`
 
-  nullCheck(TransferRequest, methodPath)
-
-  validateSchema(Transfer.validate(TransferRequest), methodPath)
-
-  const transaction = transactionForTransfer(TransferRequest)
-
-  return transaction
-}
-
-/**
- * @description Create a valid debit request from transfer request
- * @function
- * @param {Transfer} [transferRequest] input data for create debit operation
- * @returns {[Debit, Transaction] }
- */
-export const debitForTransfer = (
-  transferRequest: Transfer,
-): [Debit, Transaction] => {
-  const methodPath = `${namespace}.validateDebit`
-
-  nullCheck(transferRequest, methodPath)
-
-  const debitRequest: Debit = {
-    accountID: transferRequest.originID,
-    amount: transferRequest.amount,
-    service: Service.TRANSFER,
-    operation: OperationType.DEBIT
+  const creditRequest: OperationRequest = {
+    originId: data.originId,
+    destinationId: data.destinationId,
+    amount: data.amount,
+    serviceOrigin: data.serviceOrigin,
+    operation: OperationType.CREDIT,
+    requester: ServiceRequester.CORE,
+    token: generateToken(debitTransaction, methodPath)
   }
 
-  const transaction: Transaction = validateDebitRequest(debitRequest)
-
-  return [debitRequest, transaction]
-}
-
-/**
- * @description Create a valid credit request from transfer request
- * @function
- * @param {Transfer} [transferRequest] input data for create transfer
- * @returns {[Credit, Transaction]}
- */
-export const creditForTransfer = (
-  transferRequest: Transfer,
-): [Credit, Transaction] => {
-  const methodPath = `${namespace}.validatecredit`
-
-  nullCheck(transferRequest, methodPath)
-
-  const creditRequest: Credit = {
-    accountID: transferRequest.originID,
-    amount: transferRequest.amount,
-    service: Service.TRANSFER,
-    operation: OperationType.CREDIT
-  }
-
-  const transaction: Transaction = validateCredit(creditRequest)
-
-  return [creditRequest, transaction]
-}
-
-
-/**
- * @description Create a Transaction for a Credit Operation
- * @function
- * @param {Credit} [data] input data for create task
- * @returns {Transaction}
- */
-export const transactionForTransfer = (
-  data: Transfer
-): Transaction => {
-  const methodPath = `${namespace}.transactionForTransfer`
-
-  const createdAt = toISOString()
-
-  const updatedAt = createdAt
-
-  const transaction: Transaction = {
-    // default values if is missing
-    ...data,
-    operation: OperationType.TRANSFER,
-    status: TransactionStatus.PENDING,
-    createdAt,
-    updatedAt,
-    // information from system
-    id: uuidv4(),
-  }
-
-  validateTransaction(transaction)
-
-  return transaction
+  return validateCreditRequest(creditRequest, debitTransaction)
 }
