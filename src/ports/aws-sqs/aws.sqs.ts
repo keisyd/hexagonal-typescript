@@ -67,6 +67,7 @@ export const receiveMessage = <T>(sqs: SQS, queueUrl: string, maxNumberOfMessage
     }
 
     const value = operationResult.Messages.map(message => typeof message.Body !== 'undefined' ? JSON.parse(message.Body) as A : null)
+
     const requestId = operationResult.$response.requestId
 
     return {

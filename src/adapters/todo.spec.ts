@@ -9,16 +9,16 @@ import todoAdapterFactory from './todo'
 jest.mock('@utils/errors')
 jest.mock('@business/todo')
 
-; (throwCustomError as any).mockImplementation((error: Error) => {
-  // eslint-disable-next-line functional/no-throw-statement
-  throw error
-})
+  (throwCustomError as any).mockImplementation((error: Error) => {
+    // eslint-disable-next-line functional/no-throw-statement
+    throw error
+  })
 
-; (validateCreateTodo as any).mockImplementation((args: any) => ({ ...args, taskStatus: ETodoStatus.NEW, taskOwner: 'owner' }))
+  (validateCreateTodo as any).mockImplementation((args: any) => ({ ...args, taskStatus: ETodoStatus.NEW, taskOwner: 'owner' }))
 
-; (validateUpdateTodo as any).mockImplementation((args: any) => ({ ...args }))
+  (validateUpdateTodo as any).mockImplementation((args: any) => ({ ...args }))
 
-; (validateDeleteTodo as any).mockImplementation((args: any) => ({ ...args }))
+  (validateDeleteTodo as any).mockImplementation((args: any) => ({ ...args }))
 
 // mock logger calls
 const loggerMock = {
@@ -168,7 +168,6 @@ describe('updateTodo', () => {
         taskPriority = :taskPriority,
         updatedAt = :updatedAt
     `
-
     expect(updateDocument).toHaveBeenCalled()
     expect(updateDocument).toHaveBeenCalledWith({ id: data.id }, updateExpression, expect.objectContaining(updatedData))
     expect(loggerMock.info).toHaveBeenCalled()

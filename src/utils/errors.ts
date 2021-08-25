@@ -45,16 +45,18 @@ export const throwCustomError = <E extends Error>(error: E, methodPath: string, 
  * @param {string} [methodPath] method path
  * @returns {Todo}
  */
- export const nullCheck = (
+export const nullCheck = <T>(
   data: any,
   methodPath: string,
-): void => {
+): T => {
   if (R.isNil(data)) {
     return throwCustomError(
       new Error("invalid entry on field data, missing information"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
-};
+
+  return data
+}
 

@@ -1,9 +1,9 @@
-import R from "ramda";
-import { Request } from "express";
-import { LoggerInstance } from "@ports/logger";
-import { AdapterFacade } from "@adapters";
-import { Todo } from "@models";
-import { EClassError, throwCustomError } from "@utils";
+import R from "ramda"
+import { Request } from "express"
+import { LoggerInstance } from "@ports/logger"
+import { AdapterFacade } from "@adapters"
+import { Todo } from "@models"
+import { EClassError, throwCustomError } from "@utils"
 
 /**
  * @description Get Task by id
@@ -16,26 +16,26 @@ export const getTodo = (
   logger: LoggerInstance,
   adapter: AdapterFacade
 ) => async (req: Request): Promise<Todo> => {
-  const methodPath = "api.controllers.todo.getTodo";
+  const methodPath = "api.controllers.todo.getTodo"
   try {
     /**
      * disclaimer : the user in production environment,
      * user will be sent by the midlleware authentication who call the method on http
      */
-    const todo = await adapter.todo.getTodo(req.params.id);
+    const todo = await adapter.todo.getTodo(req.params.id)
     if (R.isNil(todo)) {
       return throwCustomError(
         new Error("id not found"),
         methodPath,
         EClassError.USER_ERROR
-      );
+      )
     }
-    return todo;
+    return todo
   } catch (error) {
-    logger.error(methodPath, error);
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    logger.error(methodPath, error)
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}
 
 /**
  * @description Create Task
@@ -47,7 +47,7 @@ export const createTodo = (
   logger: LoggerInstance,
   adapter: AdapterFacade
 ) => async (req: Request) => {
-  const methodPath = "api.controller.todo.createTodo";
+  const methodPath = "api.controller.todo.createTodo"
   try {
     /**
      * TODO validate body
@@ -57,13 +57,13 @@ export const createTodo = (
      * disclaimer : the user in production environment,
      * user will be sent by the midlleware authentication who call the method on http
      */
-    const todo = await adapter.todo.createTodo(req.body.data, req.body.user);
-    return todo;
+    const todo = await adapter.todo.createTodo(req.body.data, req.body.user)
+    return todo
   } catch (error) {
-    logger.error(methodPath, error.message);
-    return throwCustomError(error, methodPath, EClassError.USER_ERROR);
+    logger.error(methodPath, error.message)
+    return throwCustomError(error, methodPath, EClassError.USER_ERROR)
   }
-};
+}
 
 /**
  * @description Update Task
@@ -75,7 +75,7 @@ export const updateTodo = (
   logger: LoggerInstance,
   adapter: AdapterFacade
 ) => async (req: Request) => {
-  const methodPath = "api.controller.todo.updateTodo";
+  const methodPath = "api.controller.todo.updateTodo"
   try {
     /**
      * TODO validate body
@@ -89,13 +89,13 @@ export const updateTodo = (
       req.params.id,
       req.body.data,
       req.body.user
-    );
-    return todo;
+    )
+    return todo
   } catch (error) {
-    logger.error(methodPath, error);
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    logger.error(methodPath, error)
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}
 
 /**
  * @description Delete Task
@@ -107,16 +107,16 @@ export const deleteTodo = (
   logger: LoggerInstance,
   adapter: AdapterFacade
 ) => async (req: Request) => {
-  const methodPath = "api.controller.todo.deleteTodo";
+  const methodPath = "api.controller.todo.deleteTodo"
   try {
     /**
      * disclaimer : the user in production environment,
      * user will be sent by the midlleware authentication who call the method on http
      */
-    const todo = await adapter.todo.deleteTodo(req.params.id, req.body.user);
-    return todo;
+    const todo = await adapter.todo.deleteTodo(req.params.id, req.body.user)
+    return todo
   } catch (error) {
-    logger.error(methodPath, error);
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    logger.error(methodPath, error)
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}

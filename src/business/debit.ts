@@ -1,95 +1,113 @@
-import { root, toISOString } from "@business";
-import { nullCheck } from "@utils";
-import Joi from "joi";
+import { root, toISOString, validateSuccessTransaction, validateTransaction } from "@business"
+import { EClassError, nullCheck, throwCustomError } from "@utils"
+import Joi from "joi"
 import {
-  Debit, Transaction, OperationType, Service, TransactionStatus
-} from "../models";
-import { v4 as uuidv4 } from "uuid";
-import { validateSchema } from "./schema";
+  OperationRequest, OperationType, Service, Transaction, TransactionStatus,
+} from "@models"
+import { v4 as uuidv4 } from "uuid"
+import { validateSchema } from "./schema"
 
-const namespace:string = `${root}.debit`
+const namespace: string = `${root}.debit`
 
-export const debit = Joi.object<Debit>({
-  accountID: Joi.string().required(),
-  amount: Joi.number().integer().min(0),
-  service: Joi.string().invalid(...Object.values(Service.DEPOSIT)).valid(...Object.values(Service)),
-  operation: Joi.string().valid(...Object.values(OperationType.DEBIT)),
-});
+export const debitRequestSchema = Joi.object<OperationRequest>({
+  originId: Joi.string().required(),
+  destinationId: Joi.string().required(),
+  amount: Joi.number().integer().min(0).required(),
+  serviceOrigin: Joi.string().invalid(...Object.values(Service.DEPOSIT)).valid(...Object.values(Service)).required(),
+  operation: Joi.string().valid(...Object.values(OperationType.DEBIT)).required(),
+})
 
 /**
- * @description Validate a Debit event on creating and return a transaction
+ * @description Validate debit Request
  * @function
- * @param {Debit} [debitRequest] input data for create debit operation
- * @returns {Transaction}
+ * @param {OperationRequest} [data] the debit request
+ * @returns {OperationRequest}
  */
 export const validateDebitRequest = (
-  debitRequest: Debit,
-): Transaction => {
-  const methodPath = `${namespace}.validateDebit`;
+  data: OperationRequest,
+  lastTransaction: Transaction
+): OperationRequest => {
+  const methodPath = `${namespace}.validateDebitRequest`
 
-  nullCheck(debitRequest, methodPath);
+  data = nullCheck<OperationRequest>(data, methodPath)
 
-  validateSchema(debit.validate(debitRequest), methodPath);
+  if (data.originId == lastTransaction.walletId) {
+    if (data.amount < lastTransaction.amount)
+      return validateSchema<OperationRequest>(data, debitRequestSchema.validate(data), methodPath)
 
-  const transaction = transactionForDebit(debitRequest, TransactionStatus.PENDING);
-
-  return transaction;
-};
-
-/**
- * @description Validate a Debit event on creating and return a transaction
- * @function
- * @param {Debit} [debitRequest] input data for create debit operation
- * @returns {Transaction}
- */
- export const validateDebitWallet = (
-  debitRequest: Debit,
-): Transaction => {
-  const methodPath = `${namespace}.validateDebit`;
-
-  nullCheck(debitRequest, methodPath);
-
-  validateSchema(debit.validate(debitRequest), methodPath);
-
-  const transaction = transactionForDebit(debitRequest, TransactionStatus.PENDING);
-
-  return transaction;
-};
+    return throwCustomError(
+      new Error("Insuficient Funds"),
+      methodPath,
+      EClassError.USER_ERROR
+    )
+  } else {
+    return throwCustomError(
+      new Error("Inconsistent Debit Request. originId must match walletId of the last transaction"),
+      methodPath,
+      EClassError.USER_ERROR
+    )
+  }
+}
 
 /**
- * @description Create a Transaction for a Debit Operation
+ * @description Takes the debit request and the last Transaction on
+ * the wallet then returns a Debited Transaction
  * @function
- * @param {Debit} [data] input data for create task
+ * @param {OperationRequest} [data] the debit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
  * @returns {Transaction}
  */
- export const transactionForDebit = (
-  data: Debit,
-  status: TransactionStatus
-  ): Transaction => {
-  const methodPath = `${namespace}.createForDebit`;
+export const createDebitTransaction = (
+  data: OperationRequest,
+  lastTransaction: Transaction
+): Transaction => {
+  const methodPath = `${namespace}.createDebitTransaction`
 
-  const createdAt = toISOString();
+  data = validateDebitRequest(data, lastTransaction)
 
-  const updatedAt = createdAt;
-
-  nullCheck(data, methodPath);
+  ///Todo: Should I validate the lastTransaction?
 
   const transaction: Transaction = {
     // default values if is missing
-    destinationID:"UUDI DEFAULT", //!TODO: Insert a defatult from env
-    originID: data.accountID,
+    walletId: lastTransaction.walletId,
+    destinationId: data.destinationId, //!TODO: Insert a defatult from env
+    originId: data.originId,
     operation: OperationType.DEBIT,
-    amount: data.amount,
-    service: data.service,
-    status: status,
-    createdAt,
-    updatedAt,
-    // information from system
-    id: uuidv4(),
-  };
+    serviceOrigin: data.serviceOrigin,
+    status: TransactionStatus.SUCCESS,
+    amount: debit(lastTransaction.amount, data.amount),
+    previousAmount: lastTransaction.amount,
+    amountTransacted: data.amount,
+    walletStatus: lastTransaction.walletStatus,
+    transactionTime: toISOString()
+  }
 
-  return transaction;
-};
+  return validateSuccessTransaction(transaction)
+}
+
+/**
+ * @description Takes the debit request and the last Transaction on
+ * the wallet then returns a Debited Transaction
+ * @function
+ * @param {OperationRequest} [data] the debit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
+ * @returns {Transaction}
+ */
+export const debit = (
+  currentAmount: number,
+  transactionAmount: number
+): number => {
+  const methodPath = `${namespace}.debit`
+
+  if (currentAmount > transactionAmount)
+    return (currentAmount - transactionAmount)
+
+  return throwCustomError(
+    new Error("Can't debit. currentAmount must be greater than transactionAmount"),
+    methodPath,
+    EClassError.USER_ERROR
+  )
+}
 
 
 

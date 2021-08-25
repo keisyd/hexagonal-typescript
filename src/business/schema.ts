@@ -1,14 +1,11 @@
-import { EClassError, throwCustomError } from "@utils";
-import Joi from "joi";
-import R from "ramda";
-import { v4 as uuidv4 } from "uuid";
+import { EClassError, throwCustomError } from "@utils"
+import Joi from "joi"
 import {
   CreateTodoInput,
   EPriority,
   ETodoStatus,
   Todo,
-} from "../models";
-import { toISOString } from "./moment";
+} from "../models"
 
 const todoSchema = Joi.object<Todo>({
   taskOrder: Joi.number().integer().min(0),
@@ -19,7 +16,7 @@ const todoSchema = Joi.object<Todo>({
   id: Joi.string().required(),
   createdAt: Joi.string().isoDate(),
   updatedAt: Joi.string().isoDate(),
-});
+})
 
 /**
  * @description Validate a Todo event on creation
@@ -28,15 +25,17 @@ const todoSchema = Joi.object<Todo>({
  * @param {string} [owner] owner of the task
  * @returns {Todo}
  */
-export const validateSchema = (
+export const validateSchema = <T>(
+  object: any,
   validation: Joi.ValidationResult,
   methodPath: string
-): void => {
+): T => {
   if (validation.error) {
     return throwCustomError(
       validation.error,
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
-};
+  return object
+}

@@ -1,11 +1,11 @@
-import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
-import { Withdraw } from "@models";
-import { EClassError, throwCustomError } from "@utils";
-import { LoggerInstance } from "@ports/logger";
+import { DynamoRepositoryInstance } from "@ports/aws-dynamo"
+import { Withdraw } from "@models"
+import { EClassError, throwCustomError } from "@utils"
+import { LoggerInstance } from "@ports/logger"
 
 export type withdrawAdapterInstance = {
-  readonly withdraw: (id: string) => Promise<withdraw | null>;
-};
+  readonly withdraw: (id: string) => Promise<withdraw | null>
+}
 
 /**
  * @description Todo adapter factory
@@ -19,9 +19,9 @@ const todoAdapterFactory = (
   repository: DynamoRepositoryInstance<Withdraw>
 ): withdrawAdapterInstance => ({
   withdraw: withdraw(repository),
-});
+})
 
-export default todoAdapterFactory;
+export default todoAdapterFactory
 
 /**
  * @description Handler function to get todo data by id .
@@ -39,11 +39,11 @@ const withdraw = (repository: DynamoRepositoryInstance<withdraw>) => async (
   /// business validarwithdraw(1, 2)
 
   /// enviar para outra carteira
-  const methodPath = "adapters.balance-operations.withdraw";
+  const methodPath = "adapters.balance-operations.withdraw"
   try {
-    const result = await repository.getDocument({ id });
-    return result.value;
+    const result = await repository.getDocument({ id })
+    return result.value
   } catch (error) {
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}

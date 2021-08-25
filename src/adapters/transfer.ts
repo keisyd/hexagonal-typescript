@@ -1,12 +1,12 @@
-import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
-import { Transfer } from "@models";
-import { EClassError, throwCustomError } from "@utils";
-import { LoggerInstance } from "@ports/logger";
-import {} from "@models/transfer";
+import { DynamoRepositoryInstance } from "@ports/aws-dynamo"
+import { Transfer } from "@models"
+import { EClassError, throwCustomError } from "@utils"
+import { LoggerInstance } from "@ports/logger"
+import { } from "@models/transfer"
 
 export type TransferAdapterInstance = {
-  readonly transfer: (id: string) => Promise<Transfer | null>;
-};
+  readonly transfer: (id: string) => Promise<Transfer | null>
+}
 
 /**
  * @description Todo adapter factory
@@ -20,9 +20,9 @@ const todoAdapterFactory = (
   repository: DynamoRepositoryInstance<Transfer>
 ): TransferAdapterInstance => ({
   transfer: transfer(repository),
-});
+})
 
-export default todoAdapterFactory;
+export default todoAdapterFactory
 
 /**
  * @description Handler function to get todo data by id .
@@ -33,7 +33,7 @@ export default todoAdapterFactory;
 const transfer = (repository: DynamoRepositoryInstance<Transfer>) => async (
   id: string
 ) => {
-  const methodPath = "adapters.balance-operations.transfer";
+  const methodPath = "adapters.balance-operations.transfer"
   /// @adpater buscareVerificarEBloquear 1 (withdraw)
 
   /// @adpater buscarVerificar 2 (deposit)
@@ -42,9 +42,10 @@ const transfer = (repository: DynamoRepositoryInstance<Transfer>) => async (
 
   /// enviar para outra carteira
   try {
-    const result = await repository.getDocument({ id });
-    return result.value;
+    const result = await repository.getDocument({ id })
+    return result.value
   } catch (error) {
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}
+

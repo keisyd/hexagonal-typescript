@@ -1,16 +1,16 @@
-import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
-import { Transaction } from "@models";
-import { EClassError, throwCustomError } from "@utils";
-import { LoggerInstance } from "@ports/logger";
-import { root } from "@adapters";
-import { validateTransaction } from "@business";
+import { DynamoRepositoryInstance } from "@ports/aws-dynamo"
+import { Transaction } from "@models"
+import { EClassError, throwCustomError } from "@utils"
+import { LoggerInstance } from "@ports/logger"
+import { root } from "@adapters"
+import { validateTransaction } from "@business"
 
-const namespace:string = `${root}.transaction`
+const namespace: string = `${root}.transaction`
 
 export type TransactionAdapterInstance = {
-  readonly getTransaction: (walletId: string) => Promise<Transaction | null>;
-  readonly createTransaction: (id: Transaction) => Promise<Transaction | null>;
-};
+  readonly getTransaction: (walletId: string) => Promise<Transaction | null>
+  readonly createTransaction: (id: Transaction) => Promise<Transaction | null>
+}
 
 /**
  * @description Todo adapter factory
@@ -25,9 +25,9 @@ const transactionAdapterFactory = (
 ): TransactionAdapterInstance => ({
   getTransaction: getTransaction(repository),
   createTransaction: createTransaction(repository),
-});
+})
 
-export default transactionAdapterFactory;
+export default transactionAdapterFactory
 
 /**
  * @description Handler function to get transaction data by wallet id .
@@ -38,14 +38,15 @@ export default transactionAdapterFactory;
 const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => async (
   walletId: string
 ) => {
-  const methodPath = `${namespace}.getTransaction`;
+  const methodPath = `${namespace}.getTransaction`
   try {
-    const result = await repository.getDocument({ walletId });
-    return result.value;
+    const result = await repository.getDocument({ walletId })
+
+    return result.value
   } catch (error) {
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}
 
 /**
  * @description Handler function to get transaction data by wallet id .
@@ -56,17 +57,17 @@ const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => as
 const createTransaction = (repository: DynamoRepositoryInstance<Transaction>) => async (
   transaction: Transaction
 ) => {
-  const methodPath = `${namespace}.createTransaction`;
+  const methodPath = `${namespace}.createTransaction`
   try {
-    transaction = validateTransaction(transaction);
+    transaction = validateTransaction(transaction)
 
-    const result = await repository.putDocument({ transaction });
+    const result = await repository.putDocument({ transaction })
 
-    return result.value;
+    return result.value
   } catch (error) {
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}
 
 
 

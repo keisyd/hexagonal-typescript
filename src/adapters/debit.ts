@@ -1,15 +1,15 @@
-import { DynamoRepositoryInstance } from "@ports/aws-dynamo";
-import { Debit, Transaction, Wallet } from "@models";
-import { EClassError, throwCustomError } from "@utils";
-import { LoggerInstance } from "@ports/logger";
-import { transactionForDebit, validateDebit, validateDebitRequest, validateTransaction } from "@business";
-import { root, AdapterFacade } from "@adapters";
+import { DynamoRepositoryInstance } from "@ports/aws-dynamo"
+import { Debit, Transaction, Wallet } from "@models"
+import { EClassError, throwCustomError } from "@utils"
+import { LoggerInstance } from "@ports/logger"
+import { transactionForDebit, validateDebit, validateDebitRequest, validateTransaction } from "@business"
+import { root, AdapterFacade } from "@adapters"
 
-const namespace:string = `${root}.debit`
+const namespace: string = `${root}.debit`
 
 export type DebitAdapterInstance = {
-  readonly debit: (id: Wallet) => Promise<Debit | null>;
-};
+  readonly debit: (id: Wallet) => Promise<Debit | null>
+}
 
 /**
  * @description Todo adapter factory
@@ -23,9 +23,9 @@ const todoAdapterFactory = (
   repository: DynamoRepositoryInstance<Wallet>,
 ): DebitAdapterInstance => ({
   debit: debit(repository),
-});
+})
 
-export default todoAdapterFactory;
+export default todoAdapterFactory
 
 /**
  * @description Handler function to get todo data by id .
@@ -39,19 +39,17 @@ const debit = (
 ) => (repository: DynamoRepositoryInstance<Wallet>) => async (
   debitRequest: Debit
 ) => {
-  const methodPath = `${namespace}.transfer`;
+  const methodPath = `${namespace}.transfer`
 
   try {
-    const transaction:Transaction = validateDebitRequest(debitRequest);
+    validateDebitRequest(debitRequest)
 
+    adapter.transaction.createTransaction(transaction)
 
+    const result = await repository.getDocument({ id })
 
-    adapter.transaction.createTransaction(transaction);
-
-    const result = await repository.getDocument({ id });
-
-    return result.value;
+    return result.value
   } catch (error) {
-    return throwCustomError(error, methodPath, EClassError.INTERNAL);
+    return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
-};
+}

@@ -1,73 +1,101 @@
-import { root, toISOString } from "@business";
-import { nullCheck } from "@utils";
-import Joi from "joi";
+import { root, toISOString, validateSuccessTransaction, validateTransaction } from "@business"
+import { EClassError, nullCheck, throwCustomError } from "@utils"
+import Joi from "joi"
 import {
-  Credit, Transaction, OperationType, Service, Transfer
-} from "../models";
-import { validateSchema } from "./schema";
-import { v4 as uuidv4 } from "uuid";
-import { validateTransaction } from "./transaction";
+  OperationRequest, OperationType, Service, Transaction, TransactionStatus,
+} from "@models"
+import { v4 as uuidv4 } from "uuid"
+import { validateSchema } from "./schema"
 
-const namespace:string = `${root}.credit`
+const namespace: string = `${root}.credit`
 
-export const credit = Joi.object<Credit>({
-  accountID: Joi.string().required(),
-  amount: Joi.number().integer().min(0),
-  service: Joi.string().invalid(...Object.values(Service.WITHDRAW)).valid(...Object.values(Service)),
-  operation: Joi.string().valid(...Object.values(OperationType.CREDIT)),
-});
+export const creditRequestSchema = Joi.object<OperationRequest>({
+  originId: Joi.string().required(),
+  destinationId: Joi.string().required(),
+  amount: Joi.number().integer().min(0).required(),
+  serviceOrigin: Joi.string().invalid(...Object.values(Service.DEPOSIT)).valid(...Object.values(Service)).required(),
+  operation: Joi.string().valid(...Object.values(OperationType.DEBIT)).required(),
+})
 
 /**
- * @description Validate a credit event on creating and return a transaction
+ * @description Validate credit Request
  * @function
- * @param {credit} [creditRequest] input data for create credit operation
+ * @param {OperationRequest} [data] the credit request
+ * @returns {OperationRequest}
+ */
+export const validateCreditRequest = (
+  data: OperationRequest,
+  lastTransaction: Transaction
+): OperationRequest => {
+  const methodPath = `${namespace}.validateCreditRequest`
+
+  data = nullCheck<OperationRequest>(data, methodPath)
+
+  if (data.destinationId == lastTransaction.walletId)
+    return validateSchema<OperationRequest>(data, creditRequestSchema.validate(data), methodPath)
+
+
+  return throwCustomError(
+    new Error("Inconsistent Credit Request. The destinationId must match walletId of the last transaction"),
+    methodPath,
+    EClassError.USER_ERROR
+  )
+}
+
+/**
+ * @description Takes the credit request and the last Transaction on
+ * the wallet then returns a Credited Transaction
+ * @function
+ * @param {OperationRequest} [data] the credit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
  * @returns {Transaction}
  */
-export const validateCredit = (
-  creditRequest: Credit,
+export const createCreditTransaction = (
+  data: OperationRequest,
+  lastTransaction: Transaction
 ): Transaction => {
-  const methodPath = `${namespace}.validateCredit`;
+  const methodPath = `${namespace}.createCreditTransaction`
 
-  nullCheck(creditRequest, methodPath);
+  data = validateCreditRequest(data, lastTransaction)
 
-  validateSchema(credit.validate(creditRequest), methodPath);
-
-  const transaction = transactionForCredit(creditRequest);
-
-  return transaction;
-};
-
-
-/**
- * @description Create a Transaction for a Credit Operation
- * @function
- * @param {Credit} [data] input data for create task
- * @returns {Transaction}
- */
- export const transactionForCredit = (
-  data: Credit,
-  ): Transaction => {
-  const methodPath = `${namespace}.createForCredit`;
-
-  const createdAt = toISOString();
-
-  const updatedAt = createdAt;
-
-  nullCheck(data, methodPath);
+  ///Todo: Should I validate the lastTransaction?
 
   const transaction: Transaction = {
     // default values if is missing
-    destinationID:"UUDI DEFAULT", //!TODO: Insert a defatult from env
-    originID: data.accountID,
-    ...data,
-    status:TransactionStatus.PENDING,
-    createdAt,
-    updatedAt,
-    // information from system
-    id: uuidv4(),
-  };
+    walletId: lastTransaction.walletId,
+    destinationId: data.destinationId, //!TODO: Insert a defatult from env
+    originId: data.originId,
+    operation: OperationType.DEBIT,
+    serviceOrigin: data.serviceOrigin,
+    status: TransactionStatus.SUCCESS,
+    amount: credit(lastTransaction.amount, data.amount),
+    previousAmount: lastTransaction.amount,
+    amountTransacted: data.amount,
+    walletStatus: lastTransaction.walletStatus,
+    transactionTime: toISOString()
+  }
 
-  validateTransaction(transaction);
+  return validateSuccessTransaction(transaction)
+}
 
-  return transaction;
-};
+/**
+ * @description Takes the credit request and the last Transaction on
+ * the wallet then returns a Credited Transaction
+ * @function
+ * @param {OperationRequest} [data] the credit request
+ * @param {Transaction} [lastTransaction] the last transaction on the origin wallet
+ * @returns {Transaction}
+ */
+export const credit = (
+  currentAmount: number,
+  transactionAmount: number
+): number => {
+  const methodPath = `${namespace}.credit`
+
+  return (currentAmount + transactionAmount)
+}
+
+
+
+
+

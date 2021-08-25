@@ -11,5 +11,8 @@
     "reports/coverage/coverage-final.json",
     "reports/coverage/lcov*.info",
     "reports/cov*.xml"
-  ]
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

@@ -1,7 +1,7 @@
-import { EClassError, throwCustomError } from "@utils";
-import Joi from "joi";
-import R from "ramda";
-import { v4 as uuidv4 } from "uuid";
+import { EClassError, throwCustomError } from "@utils"
+import Joi from "joi"
+import R from "ramda"
+import { v4 as uuidv4 } from "uuid"
 import {
   CreateTodoInput,
   EPriority,
@@ -9,8 +9,8 @@ import {
   MutateTodoInput,
   MutateTodoOutput,
   Todo,
-} from "../models";
-import { toISOString } from "./moment";
+} from "../models"
+import { toISOString } from "./moment"
 
 const todoSchema = Joi.object<Todo>({
   taskOrder: Joi.number().integer().min(0),
@@ -21,7 +21,7 @@ const todoSchema = Joi.object<Todo>({
   id: Joi.string().required(),
   createdAt: Joi.string().isoDate(),
   updatedAt: Joi.string().isoDate(),
-});
+})
 
 /**
  * @description Validate a Todo event on creation
@@ -34,16 +34,16 @@ export const validateCreateTodo = (
   data: CreateTodoInput,
   owner?: string
 ): Todo => {
-  const createdAt = toISOString();
-  const updatedAt = createdAt;
-  const methodPath = "business.todo.validateCreateTodo";
+  const createdAt = toISOString()
+  const updatedAt = createdAt
+  const methodPath = "business.todo.validateCreateTodo"
 
   if (R.isNil(data)) {
     return throwCustomError(
       new Error("invalid entry on field data, missing information"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   if (R.isNil(owner)) {
@@ -51,7 +51,7 @@ export const validateCreateTodo = (
       new Error("owner is missing"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   const todo: Todo = {
@@ -65,20 +65,20 @@ export const validateCreateTodo = (
     createdAt,
     updatedAt,
     id: uuidv4(),
-  };
+  }
 
-  const validation = todoSchema.validate(todo);
+  const validation = todoSchema.validate(todo)
 
   if (validation.error) {
     return throwCustomError(
       validation.error,
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
-  return todo;
-};
+  return todo
+}
 
 /**
  * @description Validate a Todo event on update
@@ -93,21 +93,21 @@ export const validateUpdateTodo = (
   originalData?: Todo | null,
   owner?: string
 ): MutateTodoOutput => {
-  const updatedAt = toISOString();
-  const methodPath = "business.todo.validateUpdateTodo";
+  const updatedAt = toISOString()
+  const methodPath = "business.todo.validateUpdateTodo"
   const allowedMutate = [
     "taskOrder",
     "taskDescription",
     "taskStatus",
     "taskPriority",
-  ];
+  ]
 
   if (R.isNil(originalData)) {
     return throwCustomError(
       new Error("no data for this id"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   if (
@@ -123,7 +123,7 @@ export const validateUpdateTodo = (
       ),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   if (R.isNil(owner)) {
@@ -131,30 +131,30 @@ export const validateUpdateTodo = (
       new Error("owner is missing"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   const todo: Todo = {
     ...originalData,
     ...data,
     updatedAt,
-  };
+  }
 
-  const validation = todoSchema.validate(todo);
+  const validation = todoSchema.validate(todo)
 
   if (validation.error) {
     return throwCustomError(
       validation.error,
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   return ["taskOwner", "id", "createdAt"].reduce(
     (reducedData, field) => R.dissoc(field, reducedData),
     todo
-  );
-};
+  )
+}
 
 /**
  * @description Validate a Todo event on delete
@@ -167,13 +167,13 @@ export const validateDeleteTodo = (
   originalData?: Todo | null,
   owner?: string
 ): Todo => {
-  const methodPath = "business.todo.validateDeleteTodo";
+  const methodPath = "business.todo.validateDeleteTodo"
   if (R.isNil(originalData)) {
     return throwCustomError(
       new Error("no data for this id"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
   if (R.isNil(owner)) {
@@ -181,8 +181,8 @@ export const validateDeleteTodo = (
       new Error("owner is missing"),
       methodPath,
       EClassError.USER_ERROR
-    );
+    )
   }
 
-  return originalData;
-};
+  return originalData
+}
