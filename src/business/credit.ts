@@ -1,4 +1,4 @@
-import { root, toISOString, validateSuccessTransaction } from "@business"
+import { root, validateAmount, validateSuccessTransaction } from "@business"
 import { EClassError, nullCheck, throwCustomError } from "@utils"
 import Joi from "joi"
 import {
@@ -13,9 +13,9 @@ export const creditRequestSchema = Joi.object<OperationRequest>({
   originId: Joi.string().required(),
   destinationId: Joi.string().required(),
   amount: Joi.number().integer().min(0).required(),
-  serviceOrigin: Joi.string().invalid(...Object.values(Service.WITHDRAW)).valid(...Object.values(Service)).required(),
-  operation: Joi.string().valid(...Object.values(OperationType.CREDIT)).required(),
-  requester: Joi.string().invalid(...Object.values([ServiceRequester.WITHDRAW, ServiceRequester.CORE])).valid(...Object.values(ServiceRequester)).required(),
+  serviceOrigin: Joi.string().invalid(Service.WITHDRAW).required(),
+  operation: Joi.string().valid(OperationType.CREDIT).required(),
+  requester: Joi.string().invalid(ServiceRequester.WITHDRAW).required(),
   token: Joi.string().required(),
 })
 
@@ -33,8 +33,9 @@ export const validateCreditRequest = (
 
   data = nullCheck<OperationRequest>(data, methodPath)
 
-  if (data.destinationId == lastTransaction.walletId)
+  if (data.destinationId == lastTransaction.walletId) {
     return validateSchema<OperationRequest>(data, creditRequestSchema.validate(data), methodPath)
+  }
 
   return throwCustomError(
     new Error("Inconsistent Credit Request. The destinationId must match walletId of the last transaction"),
@@ -53,7 +54,8 @@ export const validateCreditRequest = (
  */
 export const createCreditTransaction = (
   data: OperationRequest,
-  lastTransaction: Transaction
+  lastTransaction: Transaction,
+  time: string
 ): Transaction => {
   const methodPath = `${namespace}.createCreditTransaction`
 
@@ -73,7 +75,8 @@ export const createCreditTransaction = (
     previousAmount: lastTransaction.amount,
     amountTransacted: data.amount,
     walletStatus: lastTransaction.walletStatus,
-    transactionTime: toISOString()
+    ///TODO: make transactionTime be future in comparision to lasTransaction.transactionTime
+    transactionTime: time
   }
 
   return validateSuccessTransaction(transaction, methodPath)
@@ -93,7 +96,7 @@ export const credit = (
 ): number => {
   const methodPath = `${namespace}.credit`
 
-  return (currentAmount + transactionAmount)
+  return (validateAmount(currentAmount, methodPath) + validateAmount(transactionAmount, methodPath))
 }
 
 

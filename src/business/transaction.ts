@@ -2,8 +2,9 @@ import Joi from "joi"
 import {
   Transaction, OperationType, Service, WalletStatus, TransactionStatus,
 } from "@models"
-import { root, toISOString, validateSchema } from "@business"
+import { root, validateSchema } from "@business"
 import { EClassError, nullCheck, throwCustomError } from "@utils"
+import { isValidEntry } from "./moment"
 
 
 const namespace = `${root}.transactions`
@@ -58,21 +59,21 @@ export const validateTransaction = (transaction: Transaction, originMethodPath: 
  * @returns {Transaction}
  */
 export const validateTransactionSchema = (
-  transaction: Transaction, originMethodPath: string
+  transaction: Transaction, originMethodPath: string,
 ): Transaction => {
   const methodPath = `${namespace}.validateTransactionSchema at ${originMethodPath}`
 
-  const transactionTime = toISOString()
-
   transaction = nullCheck<Transaction>(transaction, methodPath)
 
-  transaction = {
-    ...transaction,
-    // default values if is missing
-    transactionTime: transactionTime,
-  }
+  ///TODO: Make time comparission to be sure that current operation time is greater than the last one
+  if (isValidEntry(transaction.transactionTime))
+    return validateSchema<Transaction>(transaction, transactionSchema.validate(transaction), methodPath)
 
-  return validateSchema<Transaction>(transaction, transactionSchema.validate(transaction), methodPath)
+  return throwCustomError(
+    new Error("Date has to be unique, formated and in greater than the past."),
+    methodPath,
+    EClassError.USER_ERROR
+  )
 }
 
 /**
@@ -150,4 +151,16 @@ export const getMultiplier = (operation: OperationType): number => {
   }
 }
 
+export const validateAmount = (value: number, originMethodPath: string): number => {
+  const methodPath = `${namespace}.validateAmount at ${originMethodPath}`
+
+  if (nullCheck<number>(value, methodPath) >= 0)
+    return value
+
+  return throwCustomError(
+    new Error("Can't operate negative amount."),
+    methodPath,
+    EClassError.USER_ERROR
+  )
+}
 

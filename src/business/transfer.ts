@@ -4,8 +4,6 @@ import {
 } from "@models"
 import { ServiceRequester } from "@models/service-requester"
 import { validateCreditRequest } from "./credit"
-import { validateDebitRequest } from "./debit"
-import { validateSuccessTransaction } from "./transaction"
 
 const namespace: string = `${root}.trasnfer`
 

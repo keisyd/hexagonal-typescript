@@ -13,7 +13,10 @@ const moment: typeof _tzMoment = require('moment-timezone/builds/moment-timezone
  */
 export const momentWithTz = (dta?: MomentInput, timezone: string = momentConfig.timezone): Moment => {
   if (R.not(R.isNil(dta)) && !isValidEntry(dta)) {
-    return throwCustomError(new Error(`invalid dateTime entry, got "${dta}"`), 'business.moment.momentWithTz', EClassError.INTERNAL)
+    return throwCustomError(
+      new Error(`invalid dateTime entry, got "${dta}"`),
+      'business.moment.momentWithTz',
+      EClassError.INTERNAL)
   }
   return (R.isNil(dta) ? moment() : moment(dta)).tz(timezone)
 }

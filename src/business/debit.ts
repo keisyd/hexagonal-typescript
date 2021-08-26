@@ -1,4 +1,4 @@
-import { root, toISOString, validateSuccessTransaction } from "@business"
+import { root, validateAmount, validateSuccessTransaction } from "@business"
 import { EClassError, nullCheck, throwCustomError } from "@utils"
 import Joi from "joi"
 import {
@@ -13,9 +13,9 @@ export const debitRequestSchema = Joi.object<OperationRequest>({
   originId: Joi.string().required(),
   destinationId: Joi.string().required(),
   amount: Joi.number().integer().min(0).required(),
-  serviceOrigin: Joi.string().invalid(...Object.values(Service.DEPOSIT)).valid(...Object.values(Service)).required(),
-  operation: Joi.string().valid(...Object.values(OperationType.DEBIT)).required(),
-  requester: Joi.string().invalid(...Object.values([ServiceRequester.DEPOSIT, ServiceRequester.ATOM])).valid(...Object.values(ServiceRequester)).required(),
+  serviceOrigin: Joi.string().invalid(Service.DEPOSIT).required(),
+  operation: Joi.string().valid(OperationType.DEBIT).required(),
+  requester: Joi.string().invalid(ServiceRequester.DEPOSIT, ServiceRequester.ATOM).required(),
   token: Joi.string().required(),
 })
 
@@ -29,7 +29,8 @@ export const debitRequestSchema = Joi.object<OperationRequest>({
  */
 export const createDebitTransaction = (
   data: OperationRequest,
-  lastTransaction: Transaction
+  lastTransaction: Transaction,
+  transactionTime: string
 ): Transaction => {
   const methodPath = `${namespace}.createDebitTransaction`
 
@@ -49,7 +50,8 @@ export const createDebitTransaction = (
     previousAmount: lastTransaction.amount,
     amountTransacted: data.amount,
     walletStatus: lastTransaction.walletStatus,
-    transactionTime: toISOString()
+    ///TODO: make transactionTime be future in comparision to lasTransaction.transactionTime
+    transactionTime: transactionTime
   }
 
   return validateSuccessTransaction(transaction, methodPath)
@@ -101,15 +103,17 @@ export const debit = (
 ): number => {
   const methodPath = `${namespace}.debit`
 
-  if (currentAmount > transactionAmount)
+  if (validateAmount(currentAmount, methodPath) > validateAmount(transactionAmount, methodPath))
     return (currentAmount - transactionAmount)
 
   return throwCustomError(
-    new Error("Can't debit. currentAmount must be greater than transactionAmount"),
+    new Error("Can't debit. The currentAmount must be greater than transactionAmount"),
     methodPath,
     EClassError.USER_ERROR
   )
 }
+
+
 
 
 

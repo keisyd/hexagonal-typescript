@@ -1,4 +1,5 @@
 import { EClassError, throwCustomError } from "@utils"
+import R from 'ramda'
 import Joi from "joi"
 
 /**
@@ -9,11 +10,11 @@ import Joi from "joi"
  * @returns {Todo}
  */
 export const validateSchema = <T>(
-  object: any,
+  object: T,
   validation: Joi.ValidationResult,
   methodPath: string
 ): T => {
-  if (validation.error) {
+  if (!R.isNil(validation.error)) {
     return throwCustomError(
       validation.error,
       methodPath,
