@@ -32,9 +32,9 @@ describe('config', () => {
     expect(appConfig.isProduction).not.toBeUndefined()
     expect(appConfig.isProduction).not.toBeNull()
     expect(appConfig).toHaveProperty('envName', 'test')
-    expect(appConfig).toHaveProperty('todo')
-    expect(appConfig.todo).toHaveProperty('tableName', 'todos')
-    expect(appConfig.todo).toHaveProperty('queueUrl', 'todo')
+    expect(appConfig).toHaveProperty('transaction')
+    expect(appConfig.transaction).toHaveProperty('tableName', 'transactions')
+    expect(appConfig.transaction).toHaveProperty('queueUrl', 'transaction')
   })
   test('loggerConf', () => {
     expect(loggerConf).toBeDefined()

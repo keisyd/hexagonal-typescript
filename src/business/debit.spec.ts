@@ -35,13 +35,13 @@ describe('debit', () => {
   })
 })
 
-describe("createDebitTransaction", () => {
-  const uudiDefaultToken: string = "45d1e421-ce88-467f-bb43-b791f18c374a"
-  const walletId: string = "55d1e421-ce55-457f-bb43-b791f18c374a"
-  const random: string = "79d1e421-ce55-457f-bb43-b791f18c374a"
+describe('createDebitTransaction', () => {
+  const uudiDefaultToken: string = '45d1e421-ce88-467f-bb43-b791f18c374a'
+  const walletId: string = '55d1e421-ce55-457f-bb43-b791f18c374a'
+  const random: string = '79d1e421-ce55-457f-bb43-b791f18c374a'
   const currentAmount: number = 100
   const transactionAmount: number = 20
-  const token: string = "80d1e421-ce45-457f-cc43-ce54f18c374a"
+  const token: string = '80d1e421-ce45-457f-cc43-ce54f18c374a'
   const lastTime: string = '2020-06-01T12:00:00Z'
   const transactionTime: string = '2020-06-01T12:00:00Z'
 
@@ -103,7 +103,61 @@ describe("createDebitTransaction", () => {
     try {
       createDebitTransaction(data, lastTransaction, transactionTime)
     } catch (e) {
-      expect(e.message).toBe("Inconsistent Debit Request. originId must match walletId of the last transaction")
+      expect(e.message).toBe('Inconsistent Debit Request. originId must match walletId of the last transaction')
+    }
+  })
+
+  test('currentAmount smallet than the transactionAmount', () => {
+    const data: m.OperationRequest = {
+      originId: walletId,
+      destinationId: random,
+      amount: transactionAmount + currentAmount,
+      serviceOrigin: m.Service.WITHDRAW,
+      operation: m.OperationType.DEBIT,
+      requester: m.ServiceRequester.CORE,
+      token: token
+    }
+
+    try {
+      createDebitTransaction(data, lastTransaction, transactionTime)
+    } catch (e) {
+      expect(e.message).toBe('Insuficient Funds')
+    }
+  })
+
+  test('currentAmount smallet than the transactionAmount', () => {
+    const data: m.OperationRequest = {
+      originId: walletId,
+      destinationId: random,
+      amount: transactionAmount + currentAmount,
+      serviceOrigin: m.Service.WITHDRAW,
+      operation: m.OperationType.DEBIT,
+      requester: m.ServiceRequester.CORE,
+      token: token
+    }
+
+    try {
+      createDebitTransaction(data, lastTransaction, transactionTime)
+    } catch (e) {
+      expect(e.message).toBe('Insuficient Funds')
+    }
+  })
+
+  test('originId as random', () => {
+    const data: m.OperationRequest = {
+      originId: random,
+      destinationId: walletId,
+      amount: transactionAmount,
+      serviceOrigin: m.Service.WITHDRAW,
+      operation: m.OperationType.DEBIT,
+      requester: m.ServiceRequester.CORE,
+      token: token
+    }
+
+    try {
+      createDebitTransaction(data, lastTransaction, transactionTime)
+    } catch (e) {
+      expect(e.message).toBe('Inconsistent Debit Request. originId must match walletId of the last transaction')
     }
   })
 })

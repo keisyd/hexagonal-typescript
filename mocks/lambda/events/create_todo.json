@@ -1,11 +1,11 @@
 {
 	"body": "{\"message\": \"hello world\"}",
-	"field": "createTodo",
+	"field": "createtransaction",
 	"resource": "/{proxy+}",
 	"arguments": {
 		"user": "testUser",
 		"data": {
-			"taskDescription": "first todo",
+			"taskDescription": "first transaction",
 			"taskStatus": "NEW",
 			"taskPriority": "LOW",
 			"taskOrder": 0

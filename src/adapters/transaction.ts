@@ -1,19 +1,18 @@
-import { DynamoRepositoryInstance } from "@ports/aws-dynamo"
-import { Transaction } from "@models"
-import { EClassError, throwCustomError } from "@utils"
-import { LoggerInstance } from "@ports/logger"
-import { root } from "@adapters"
-import { validateTransaction } from "@business"
-
-const namespace: string = `${root}.transaction`
+import { DynamoRepositoryInstance } from '@ports/aws-dynamo'
+import { Transaction } from '@models'
+import { EClassError, throwCustomError } from '@utils'
+import {
+  validateTransaction
+} from '@business'
+import { LoggerInstance } from '@ports/logger'
 
 export type TransactionAdapterInstance = {
   readonly getTransaction: (walletId: string) => Promise<Transaction | null>
-  readonly createTransaction: (id: Transaction) => Promise<Transaction | null>
+  readonly createTransaction: (params: Transaction) => Promise<Transaction>
 }
 
 /**
- * @description Todo adapter factory
+ * @description Transaction adapter factory
  * @memberof adapters
  * @function
  * @param {LoggerInstance} logger instance of logger
@@ -21,27 +20,25 @@ export type TransactionAdapterInstance = {
  */
 const transactionAdapterFactory = (
   logger: LoggerInstance,
-  repository: DynamoRepositoryInstance<Transaction>,
+  repository: DynamoRepositoryInstance<Transaction>
 ): TransactionAdapterInstance => ({
   getTransaction: getTransaction(repository),
-  createTransaction: createTransaction(repository),
+  createTransaction: createTransaction(logger, repository)
 })
 
 export default transactionAdapterFactory
-
 /**
- * @description Handler function to get transaction data by wallet id .
+ * @description Handler function to get transaction data by id .
  * @memberof adapters
  * @function
  * @param {DynamoRepositoryInstance<Transaction>} repository - Dynamo database methods.
  */
 const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => async (
-  walletId: string
+  id: string
 ) => {
-  const methodPath = `${namespace}.getTransaction`
+  const methodPath = 'adapters.transaction.getTransaction'
   try {
-    const result = await repository.getDocument({ walletId })
-
+    const result = await repository.getDocument({ id })
     return result.value
   } catch (error) {
     return throwCustomError(error, methodPath, EClassError.INTERNAL)
@@ -49,27 +46,29 @@ const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => as
 }
 
 /**
- * @description Handler function to get transaction data by wallet id .
- * @memberof adapters
+ * @description Create transaction in the DynamoDB.
  * @function
- * @param {DynamoRepositoryInstance<Transaction>} repository - Dynamo database methods.
+ * @param {LoggerInstance} logger instance of logger
+ * @param {DynamoRepositoryInstance<Transaction>} repository Dynamo database methods
  */
-const createTransaction = (repository: DynamoRepositoryInstance<Transaction>) => async (
-  transaction: Transaction
-) => {
-  const methodPath = `${namespace}.createTransaction`
+const createTransaction = (
+  logger: LoggerInstance,
+  repository: DynamoRepositoryInstance<Transaction>
+) => async (params: Transaction) => {
+  const methodPath = 'adapters.transaction.createTransaction'
   try {
-    transaction = validateTransaction(transaction)
+    const result = await repository.putDocument(
+      validateTransaction(params, methodPath)
+    )
 
-    const result = await repository.putDocument({ transaction })
+    logger.info(methodPath, {
+      action: 'TASK_CREATED',
+      method: methodPath,
+      data: { ...result }
+    })
 
-    return result.value
+    return { ...result.value }
   } catch (error) {
     return throwCustomError(error, methodPath, EClassError.INTERNAL)
   }
 }
-
-
-
-
-

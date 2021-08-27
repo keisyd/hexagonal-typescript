@@ -1,13 +1,13 @@
-import { EClassError, throwCustomError } from "@utils"
+import { EClassError, throwCustomError } from '@utils'
 import R from 'ramda'
-import Joi from "joi"
+import Joi from 'joi'
 
 /**
- * @description Validate a Todo event on creation
+ * @description Validate a transaction event on creation
  * @function
- * @param {CreateTodoInput} [data] input data for create task
+ * @param {CreatetransactionInput} [data] input data for create task
  * @param {string} [owner] owner of the task
- * @returns {Todo}
+ * @returns {transaction}
  */
 export const validateSchema = <T>(
   object: T,

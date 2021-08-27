@@ -1,5 +1,5 @@
-import { root } from "@business"
-import { Transaction } from "@models"
+import { root } from '@business'
+import { Transaction } from '@models'
 
 const namespace: string = `${root}.token`
 
@@ -11,7 +11,7 @@ const namespace: string = `${root}.token`
  * @param {string} [originMethodPath]
  * @returns {string}
  */
-///TODO: Creates a real secure token
+/// transaction: Creates a real secure token
 export const generateToken = (
   transaction: Transaction, originMethodPath: string
 ): string => {

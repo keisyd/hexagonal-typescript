@@ -1,6 +1,6 @@
 locals {
 
-  dynamodb_table_name_todo = "todos"
+  dynamodb_table_name_transaction = "transactions"
 
   localstack_remote_endpoint = "http://localstack_${var.project_name}:4566"
 
@@ -18,7 +18,7 @@ locals {
     # DYNAMO
     AWS_DYNAMO_REGION          = var.region
     AWS_DYNAMO_APIVERSION      = var.versions["DYNAMODB"]
-    AWS_DYNAMO_TODO_TABLE_NAME = local.dynamodb_table_name_todo
+    AWS_DYNAMO_transaction_TABLE_NAME = local.dynamodb_table_name_transaction
 
     # SQS
     AWS_SQS_REGION     = var.region

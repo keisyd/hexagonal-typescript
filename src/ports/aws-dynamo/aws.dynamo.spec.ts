@@ -1,4 +1,4 @@
-import { Todo } from '@models'
+import { Transaction } from '@models'
 import * as utils from '@utils'
 import { EClassError, throwCustomError } from '@utils/errors'
 import { DynamoDB } from 'aws-sdk'
@@ -12,14 +12,14 @@ import { databaseRepository } from './index'
 jest.mock('aws-sdk')
 jest.mock('../../utils/errors')
 
-  (throwCustomError as any).mockImplementation((error: Error) => {
-    // eslint-disable-next-line functional/no-throw-statement
-    throw error
-  })
+; (throwCustomError as any).mockImplementation((error: Error) => {
+  // eslint-disable-next-line functional/no-throw-statement
+  throw error
+})
 
 const dynamo = new DynamoDB.DocumentClient()
 const tableName = 'mockTable'
-const repoInstance = databaseRepository<Todo>(dynamo, 'mockTable')
+const repoInstance = databaseRepository<Transaction>(dynamo, 'mockTable')
 
 const dynamoMockObject = {
   get: (Params: any) => jest.fn().mockReturnValue({
@@ -87,9 +87,9 @@ describe('getDocument', () => {
   test('error', async () => {
     const throwMessage = 'invalid id'
     const spyFn = jest.spyOn(utils, 'throwCustomError')
-      (dynamo.get as any).mockImplementationOnce(jest.fn().mockReturnValue({
-        promise: jest.fn().mockRejectedValue(new Error(throwMessage))
-      }))
+      ; (dynamo.get as any).mockImplementationOnce(jest.fn().mockReturnValue({
+      promise: jest.fn().mockRejectedValue(new Error(throwMessage))
+    }))
     const newId = uuidv4()
     await expect(repoInstance.getDocument({ id: newId })).rejects.toEqual(new Error(throwMessage))
     // throws correct message
@@ -156,9 +156,9 @@ describe('putDocument', () => {
   test('error', async () => {
     const throwMessage = 'invalid entry'
     const spyFn = jest.spyOn(utils, 'throwCustomError')
-      (dynamo.put as any).mockImplementationOnce(jest.fn().mockReturnValue({
-        promise: jest.fn().mockRejectedValue(new Error(throwMessage))
-      }))
+      ; (dynamo.put as any).mockImplementationOnce(jest.fn().mockReturnValue({
+      promise: jest.fn().mockRejectedValue(new Error(throwMessage))
+    }))
     const newId = uuidv4()
 
     await expect(repoInstance.putDocument({
@@ -175,114 +175,6 @@ describe('putDocument', () => {
       },
       TableName: tableName
     })
-  })
-})
-
-describe('updateDocument', () => {
-  beforeEach(() => {
-    (DynamoDB.DocumentClient as any).mockReset()
-  })
-  const methodPath = 'ports.aws-dynamo.updateDocument'
-  test('default case', async () => {
-    (dynamo.update as any).mockImplementationOnce((Params: any) => dynamoMockObject.update(Params)())
-    const id = uuidv4()
-
-    const result = await repoInstance.updateDocument(
-      {
-        id
-      },
-      'description := :description',
-      { description: 'mockResult' }
-    )
-
-    expect(result.value).toMatchObject({
-      id,
-      description: 'mockResult'
-    })
-    expect(dynamo.update).toHaveBeenCalled()
-    expect(dynamo.update).toHaveBeenCalledWith({
-      Key: { id },
-      TableName: tableName,
-      UpdateExpression: 'description := :description',
-      ExpressionAttributeValues: remapPrefixVariables({ description: 'mockResult' }),
-      ReturnValues: 'ALL_NEW'
-    })
-  })
-
-  test('undefined result.Attributes', async () => {
-    (dynamo.update as any).mockImplementationOnce(jest.fn().mockReturnValue({
-      promise: jest.fn().mockResolvedValue({ Attributes: undefined, $response: { requestId: uuidv4() } })
-    }))
-    const id = uuidv4()
-
-    const result = await repoInstance.updateDocument(
-      {
-        id
-      },
-      'description := :description',
-      { description: 'mockAttributes' }
-    )
-
-    expect(result.value).toEqual({})
-  })
-
-  test('error', async () => {
-    const throwMessage = 'invalid entry'
-    const spyFn = jest.spyOn(utils, 'throwCustomError')
-      (dynamo.update as any).mockImplementationOnce(jest.fn().mockReturnValue({
-        promise: jest.fn().mockRejectedValue(new Error(throwMessage))
-      }))
-    const newId = uuidv4()
-
-    await expect(repoInstance.updateDocument(
-      {
-        id: newId
-      },
-      'description := :description',
-      { description: 'mockResult' }
-    )).rejects.toEqual(new Error(throwMessage))
-    // throws correct message
-    expect(spyFn).toHaveBeenCalledWith(new Error(throwMessage), methodPath, EClassError.INTERNAL)
-    expect(dynamo.update).toHaveBeenCalled()
-    expect(dynamo.update).toHaveBeenCalledWith({
-      Key: { id: newId },
-      TableName: tableName,
-      UpdateExpression: 'description := :description',
-      ExpressionAttributeValues: remapPrefixVariables({ description: 'mockResult' }),
-      ReturnValues: 'ALL_NEW'
-    })
-  })
-})
-
-describe('deleteDocument', () => {
-  beforeEach(() => {
-    (DynamoDB.DocumentClient as any).mockReset()
-  })
-  const methodPath = 'ports.aws-dynamo.deleteDocument'
-  test('default case', async () => {
-    (dynamo.delete as any).mockImplementationOnce((Params: any) => dynamoMockObject.delete(Params)())
-    const newId = uuidv4()
-
-    const result = await repoInstance.deleteDocument({ id: newId })
-
-    expect(result.value).toBeNull()
-    expect(dynamo.delete).toHaveBeenCalled()
-    expect(dynamo.delete).toHaveBeenCalledWith({ Key: { id: newId }, TableName: tableName })
-  })
-
-  test('error', async () => {
-    const throwMessage = 'invalid id'
-    const spyFn = jest.spyOn(utils, 'throwCustomError')
-      (dynamo.delete as any).mockImplementationOnce(jest.fn().mockReturnValue({
-        promise: jest.fn().mockRejectedValue(new Error(throwMessage))
-      }))
-    const newId = uuidv4()
-
-    await expect(repoInstance.deleteDocument({ id: newId })).rejects.toThrow(throwMessage)
-    // throws correct message
-    expect(spyFn).toHaveBeenCalledWith(new Error(throwMessage), methodPath, EClassError.INTERNAL)
-    expect(dynamo.delete).toHaveBeenCalled()
-    expect(dynamo.delete).toHaveBeenCalledWith({ Key: { id: newId }, TableName: tableName })
   })
 })
 

@@ -1,5 +1,5 @@
-resource "aws_dynamodb_table" "todo_data" {
-  name           = local.dynamodb_table_name_todo
+resource "aws_dynamodb_table" "transaction_data" {
+  name           = local.dynamodb_table_name_transaction
   read_capacity  = 5
   write_capacity = 1
   hash_key       = "walletId"

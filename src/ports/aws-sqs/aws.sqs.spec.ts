@@ -12,10 +12,10 @@ import { throwCustomError } from '@utils/errors'
 jest.mock('aws-sdk')
 jest.mock('../../utils/errors')
 
-  (throwCustomError as any).mockImplementation((error: Error) => {
-    // eslint-disable-next-line functional/no-throw-statement
-    throw error
-  })
+; (throwCustomError as any).mockImplementation((error: Error) => {
+  // eslint-disable-next-line functional/no-throw-statement
+  throw error
+})
 
 /**
  * function/constants  for  test suite
@@ -121,7 +121,7 @@ describe('sendMessage', () => {
       })
     }
 
-      (SQS as any).mockImplementation(() => sqsMockObjectWithOutId)
+    ; (SQS as any).mockImplementation(() => sqsMockObjectWithOutId)
     const sqs = new SQS({
       region: AWSSqsConfig.region,
       apiVersion: AWSSqsConfig.apiVersion
@@ -141,7 +141,7 @@ describe('sendMessage', () => {
       })
     }
 
-      (SQS as any).mockImplementation(() => sqsMockObjectWithThrow)
+    ; (SQS as any).mockImplementation(() => sqsMockObjectWithThrow)
     const sqs = new SQS({
       region: 'us-east-1'
     })
@@ -169,7 +169,7 @@ describe('sendMessage', () => {
       })
     }
 
-      (SQS as any).mockImplementation(() => sqsMockObjectWithThrow)
+    ; (SQS as any).mockImplementation(() => sqsMockObjectWithThrow)
     const sqs = new SQS({
       region: 'us-east-1'
     })
@@ -275,7 +275,7 @@ describe('receiveMessage', () => {
         })
       })
     }
-      (SQS as any).mockImplementation(() => sqsMockObjectThrow)
+    ; (SQS as any).mockImplementation(() => sqsMockObjectThrow)
     const sqs = new SQS({
       region: AWSSqsConfig.region,
       apiVersion: AWSSqsConfig.apiVersion
@@ -307,7 +307,7 @@ describe('receiveMessage', () => {
         })
       })
     }
-      (SQS as any).mockImplementation(() => sqsMockObjectEmpty)
+    ; (SQS as any).mockImplementation(() => sqsMockObjectEmpty)
     const sqs = new SQS({
       region: AWSSqsConfig.region,
       apiVersion: AWSSqsConfig.apiVersion
@@ -368,7 +368,7 @@ describe('deleteMessage', () => {
         })
       })
     }
-      (SQS as any).mockImplementation(() => rejectMock)
+    ; (SQS as any).mockImplementation(() => rejectMock)
     const sqs = new SQS({
       region: AWSSqsConfig.region,
       apiVersion: AWSSqsConfig.apiVersion
@@ -393,7 +393,7 @@ describe('deleteMessage', () => {
         promise: jest.fn().mockRejectedValue(new Error(throwMessage))
       })
     }
-      (SQS as any).mockImplementation(() => rejectMock)
+    ; (SQS as any).mockImplementation(() => rejectMock)
     const sqs = new SQS({
       region: AWSSqsConfig.region,
       apiVersion: AWSSqsConfig.apiVersion

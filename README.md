@@ -3,8 +3,8 @@
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Conventional Changelog](https://img.shields.io/badge/changelog-conventional-brightgreen.svg)](http://conventional-changelog.github.io)
 [![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
-[![Coverage Status](https://coveralls.io/repos/github/hex-js/nodejs-hexagonal-boilerplate-ts/badge.svg?branch=master)](https://coveralls.io/github/hex-js/nodejs-hexagonal-boilerplate-ts?branch=master)
-[![Hex-JS](https://circleci.com/gh/hex-js/nodejs-hexagonal-boilerplate-ts.svg?style=svg)](https://circleci.com/gh/hex-js/nodejs-hexagonal-boilerplate-ts)
+[![Coverage Status](https://coveralls.io/repos/github/hex-js/balance-operations/badge.svg?branch=master)](https://coveralls.io/github/hex-js/balance-operations?branch=master)
+[![Hex-JS](https://circleci.com/gh/hex-js/balance-operations.svg?style=svg)](https://circleci.com/gh/hex-js/balance-operations)
 
 ## Inspiração
 
@@ -47,7 +47,7 @@ Concentre nela os casos de uso, nela que será construído o seu negócio.
 
 É a cola que une as camadas externas com negócio (é você controller?).
 
-Diferentemente do controller que foi projetado para arquitetura MVC e todo mundo já deixou alguma regra de negócio nele que eu sei e não adianta mentir, ele abstrai totalmente a ideia de ponte e pode ser aplicado em **qualquer contexto** dando uma flexibilidade grande para reaproveitamento de código.
+Diferentemente do controller que foi projetado para arquitetura MVC e transaction mundo já deixou alguma regra de negócio nele que eu sei e não adianta mentir, ele abstrai totalmente a ideia de ponte e pode ser aplicado em **qualquer contexto** dando uma flexibilidade grande para reaproveitamento de código.
 
 ---
 

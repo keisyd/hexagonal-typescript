@@ -1,11 +1,11 @@
-import { root, validateAmount, validateSuccessTransaction } from "@business"
-import { EClassError, nullCheck, throwCustomError } from "@utils"
-import Joi from "joi"
+import { root, validateAmount, validateSuccessTransaction } from '@business'
+import { EClassError, nullCheck, throwCustomError } from '@utils'
+import Joi from 'joi'
 import {
-  OperationRequest, OperationType, Service, Transaction, TransactionStatus,
-} from "@models"
-import { validateSchema } from "./schema"
-import { ServiceRequester } from "@models/service-requester"
+  OperationRequest, OperationType, Service, Transaction, TransactionStatus
+} from '@models'
+import { validateSchema } from './schema'
+import { ServiceRequester } from '@models/service-requester'
 
 const namespace: string = `${root}.credit`
 
@@ -16,7 +16,7 @@ export const creditRequestSchema = Joi.object<OperationRequest>({
   serviceOrigin: Joi.string().invalid(Service.WITHDRAW).required(),
   operation: Joi.string().valid(OperationType.CREDIT).required(),
   requester: Joi.string().invalid(ServiceRequester.WITHDRAW).required(),
-  token: Joi.string().required(),
+  token: Joi.string().required()
 })
 
 /**
@@ -26,19 +26,19 @@ export const creditRequestSchema = Joi.object<OperationRequest>({
  * @returns {OperationRequest}
  */
 export const validateCreditRequest = (
-  data: OperationRequest,
+  operationRequest: OperationRequest,
   lastTransaction: Transaction
 ): OperationRequest => {
   const methodPath = `${namespace}.validateCreditRequest`
 
-  data = nullCheck<OperationRequest>(data, methodPath)
+  const data: OperationRequest = nullCheck<OperationRequest>(operationRequest, methodPath)
 
-  if (data.destinationId == lastTransaction.walletId) {
+  if (data.destinationId === lastTransaction.walletId) {
     return validateSchema<OperationRequest>(data, creditRequestSchema.validate(data), methodPath)
   }
 
   return throwCustomError(
-    new Error("Inconsistent Credit Request. The destinationId must match walletId of the last transaction"),
+    new Error('Inconsistent Credit Request. The destinationId must match walletId of the last transaction'),
     methodPath,
     EClassError.USER_ERROR
   )
@@ -53,15 +53,15 @@ export const validateCreditRequest = (
  * @returns {Transaction}
  */
 export const createCreditTransaction = (
-  data: OperationRequest,
+  operationRequest: OperationRequest,
   lastTransaction: Transaction,
   time: string
 ): Transaction => {
   const methodPath = `${namespace}.createCreditTransaction`
 
-  data = validateCreditRequest(data, lastTransaction)
+  const data: OperationRequest = validateCreditRequest(nullCheck<OperationRequest>(operationRequest, methodPath), lastTransaction)
 
-  ///Todo: Should I validate the lastTransaction?
+  /// transaction: Should I validate the lastTransaction?
 
   const transaction: Transaction = {
     // default values if is missing
@@ -75,7 +75,7 @@ export const createCreditTransaction = (
     previousAmount: lastTransaction.amount,
     amountTransacted: data.amount,
     walletStatus: lastTransaction.walletStatus,
-    ///TODO: make transactionTime be future in comparision to lasTransaction.transactionTime
+    /// transaction: make transactionTime be future in comparision to lasTransaction.transactionTime
     transactionTime: time
   }
 
@@ -98,8 +98,3 @@ export const credit = (
 
   return (validateAmount(currentAmount, methodPath) + validateAmount(transactionAmount, methodPath))
 }
-
-
-
-
-

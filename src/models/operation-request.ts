@@ -1,5 +1,5 @@
-import { OperationType, Service } from "./operations"
-import { ServiceRequester } from "./service-requester"
+import { OperationType, Service } from '@models'
+import { ServiceRequester } from './service-requester'
 
 /**
  * @description The final user Transfer
@@ -44,6 +44,3 @@ export type OperationRequest = {
     */
   readonly token: string
 }
-
-
-

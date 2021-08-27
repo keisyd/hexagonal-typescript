@@ -1,11 +1,11 @@
-import { root, validateAmount, validateSuccessTransaction } from "@business"
-import { EClassError, nullCheck, throwCustomError } from "@utils"
-import Joi from "joi"
+import { root, validateAmount, validateSuccessTransaction } from '@business'
+import { EClassError, nullCheck, throwCustomError } from '@utils'
+import Joi from 'joi'
 import {
-  OperationRequest, OperationType, Service, Transaction, TransactionStatus,
-} from "@models"
-import { validateSchema } from "./schema"
-import { ServiceRequester } from "@models/service-requester"
+  OperationRequest, OperationType, Service, Transaction, TransactionStatus
+} from '@models'
+import { validateSchema } from './schema'
+import { ServiceRequester } from '@models/service-requester'
 
 const namespace: string = `${root}.debit`
 
@@ -16,7 +16,7 @@ export const debitRequestSchema = Joi.object<OperationRequest>({
   serviceOrigin: Joi.string().invalid(Service.DEPOSIT).required(),
   operation: Joi.string().valid(OperationType.DEBIT).required(),
   requester: Joi.string().invalid(ServiceRequester.DEPOSIT, ServiceRequester.ATOM).required(),
-  token: Joi.string().required(),
+  token: Joi.string().required()
 })
 
 /**
@@ -28,15 +28,15 @@ export const debitRequestSchema = Joi.object<OperationRequest>({
  * @returns {Transaction}
  */
 export const createDebitTransaction = (
-  data: OperationRequest,
+  operationRequest: OperationRequest,
   lastTransaction: Transaction,
   transactionTime: string
 ): Transaction => {
   const methodPath = `${namespace}.createDebitTransaction`
 
-  data = validateDebitRequest(data, lastTransaction)
+  const data: OperationRequest = validateDebitRequest(operationRequest, lastTransaction)
 
-  ///Todo: Should I validate the lastTransaction?
+  /// transaction: Should I validate the lastTransaction?
 
   const transaction: Transaction = {
     // default values if is missing
@@ -50,7 +50,7 @@ export const createDebitTransaction = (
     previousAmount: lastTransaction.amount,
     amountTransacted: data.amount,
     walletStatus: lastTransaction.walletStatus,
-    ///TODO: make transactionTime be future in comparision to lasTransaction.transactionTime
+    /// transaction: make transactionTime be future in comparision to lasTransaction.transactionTime
     transactionTime: transactionTime
   }
 
@@ -64,25 +64,24 @@ export const createDebitTransaction = (
  * @returns {OperationRequest}
  */
 export const validateDebitRequest = (
-  data: OperationRequest,
+  operationRequest: OperationRequest,
   lastTransaction: Transaction
 ): OperationRequest => {
   const methodPath = `${namespace}.validateDebitRequest`
 
-  data = nullCheck<OperationRequest>(data, methodPath)
+  const data: OperationRequest = nullCheck<OperationRequest>(operationRequest, methodPath)
 
-  if (data.originId == lastTransaction.walletId) {
-    if (data.amount < lastTransaction.amount)
-      return validateSchema<OperationRequest>(data, debitRequestSchema.validate(data), methodPath)
+  if (data.originId === lastTransaction.walletId) {
+    if (data.amount < lastTransaction.amount) { return validateSchema<OperationRequest>(data, debitRequestSchema.validate(data), methodPath) }
 
     return throwCustomError(
-      new Error("Insuficient Funds"),
+      new Error('Insuficient Funds'),
       methodPath,
       EClassError.USER_ERROR
     )
   } else {
     return throwCustomError(
-      new Error("Inconsistent Debit Request. originId must match walletId of the last transaction"),
+      new Error('Inconsistent Debit Request. originId must match walletId of the last transaction'),
       methodPath,
       EClassError.USER_ERROR
     )
@@ -103,8 +102,7 @@ export const debit = (
 ): number => {
   const methodPath = `${namespace}.debit`
 
-  if (validateAmount(currentAmount, methodPath) > validateAmount(transactionAmount, methodPath))
-    return (currentAmount - transactionAmount)
+  if (validateAmount(currentAmount, methodPath) > validateAmount(transactionAmount, methodPath)) { return (currentAmount - transactionAmount) }
 
   return throwCustomError(
     new Error("Can't debit. The currentAmount must be greater than transactionAmount"),
@@ -112,10 +110,3 @@ export const debit = (
     EClassError.USER_ERROR
   )
 }
-
-
-
-
-
-
-

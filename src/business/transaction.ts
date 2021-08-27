@@ -1,11 +1,10 @@
-import Joi from "joi"
+import Joi from 'joi'
 import {
-  Transaction, OperationType, Service, WalletStatus, TransactionStatus,
-} from "@models"
-import { root, validateSchema } from "@business"
-import { EClassError, nullCheck, throwCustomError } from "@utils"
-import { isValidEntry } from "./moment"
-
+  Transaction, OperationType, Service, WalletStatus, TransactionStatus
+} from '@models'
+import { root, validateSchema } from '@business'
+import { EClassError, nullCheck, throwCustomError } from '@utils'
+import { isValidEntry } from './moment'
 
 const namespace = `${root}.transactions`
 
@@ -20,7 +19,7 @@ const transactionSchema = Joi.object<Transaction>({
   operation: Joi.string().valid(...Object.values(OperationType)).required(),
   serviceOrigin: Joi.string().valid(...Object.values(Service)).required(),
   walletStatus: Joi.string().valid(...Object.values(WalletStatus)).required(),
-  status: Joi.string().valid(...Object.values(TransactionStatus)).required(),
+  status: Joi.string().valid(...Object.values(TransactionStatus)).required()
 })
 
 /**
@@ -30,23 +29,12 @@ const transactionSchema = Joi.object<Transaction>({
  * @returns {Transaction}
  */
 export const validateTransaction = (transaction: Transaction, originMethodPath: string): Transaction => {
-  const methodPath = `${namespace}.validateTransferAmount`
-
-  transaction = validateTransactionSchema(transaction, originMethodPath)
-
-  switch (transaction.status) {
+  switch (validateTransactionSchema(transaction, originMethodPath).status) {
     case TransactionStatus.SUCCESS: {
       return validateSuccessTransaction(transaction, originMethodPath)
     }
-    case TransactionStatus.SUCCESS: {
+    case TransactionStatus.FAIL: {
       return validateFailTransaction(transaction, originMethodPath)
-    }
-    default: {
-      return throwCustomError(
-        new Error("No matching status"),
-        methodPath + `at ${originMethodPath}`,
-        EClassError.USER_ERROR
-      )
     }
   }
 }
@@ -59,18 +47,17 @@ export const validateTransaction = (transaction: Transaction, originMethodPath: 
  * @returns {Transaction}
  */
 export const validateTransactionSchema = (
-  transaction: Transaction, originMethodPath: string,
+  transaction: Transaction, originMethodPath: string
 ): Transaction => {
   const methodPath = `${namespace}.validateTransactionSchema at ${originMethodPath}`
 
-  transaction = nullCheck<Transaction>(transaction, methodPath)
+  const vtransaction: Transaction = nullCheck<Transaction>(transaction, methodPath)
 
-  ///TODO: Make time comparission to be sure that current operation time is greater than the last one
-  if (isValidEntry(transaction.transactionTime))
-    return validateSchema<Transaction>(transaction, transactionSchema.validate(transaction), methodPath)
+  /// transaction: Make time comparission to be sure that current operation time is greater than the last one
+  if (isValidEntry(vtransaction.transactionTime)) { return validateSchema<Transaction>(vtransaction, transactionSchema.validate(vtransaction), methodPath) }
 
   return throwCustomError(
-    new Error("Date has to be unique, formated and in greater than the past."),
+    new Error('Date has to be unique, formated and in greater than the past.'),
     methodPath,
     EClassError.USER_ERROR
   )
@@ -87,16 +74,16 @@ export const validateTransactionSchema = (
 export const validateSuccessTransaction = (transaction: Transaction, originMethodPath: string): Transaction => {
   const methodPath = `${namespace}.validateSuccessTransaction at ${originMethodPath}`
 
-  transaction = validateTransactionSchema(nullCheck(transaction, methodPath), originMethodPath)
+  const vtransaction: Transaction = validateTransactionSchema(nullCheck(transaction, methodPath), originMethodPath)
 
-  const multiplier: number = getMultiplier(transaction.operation)
+  const multiplier: number = getMultiplier(vtransaction.operation)
 
-  if (transaction.amount == (transaction.previousAmount + (multiplier * transaction.amountTransacted))) {
-    return transaction
+  if (vtransaction.amount === (vtransaction.previousAmount + (multiplier * vtransaction.amountTransacted))) {
+    return vtransaction
   }
 
   return throwCustomError(
-    new Error("Invalid sucessfull transaction. Must respect amount = previousAmount + (operationType)*amountTransacted "),
+    new Error('Invalid sucessfull transaction. Must respect amount = previousAmount + (operationType)*amountTransacted '),
     methodPath,
     EClassError.USER_ERROR
   )
@@ -104,7 +91,7 @@ export const validateSuccessTransaction = (transaction: Transaction, originMetho
 
 /**
  * @description Validate a unsucessfull transaction
- * where the amount == previousAmount
+ * where the amount === previousAmount
  * @function
  * @param {Transaction} [transaction] input data for create task
  * @returns {voTransactionid}
@@ -112,14 +99,14 @@ export const validateSuccessTransaction = (transaction: Transaction, originMetho
 export const validateFailTransaction = (transaction: Transaction, originMethodPath: string): Transaction => {
   const methodPath = `${namespace}.validateFailTransaction at ${originMethodPath}`
 
-  transaction = validateTransactionSchema(nullCheck(transaction, methodPath), originMethodPath)
+  const vtransaction: Transaction = validateTransactionSchema(nullCheck(transaction, methodPath), originMethodPath)
 
-  if (transaction.amount == transaction.previousAmount) {
-    return transaction
+  if (vtransaction.amount === vtransaction.previousAmount) {
+    return vtransaction
   }
 
   return throwCustomError(
-    new Error("Invalid failed transaction. Must respect amount == previousAmount"),
+    new Error('Invalid failed transaction. Must respect amount === previousAmount'),
     methodPath,
     EClassError.USER_ERROR
   )
@@ -143,7 +130,7 @@ export const getMultiplier = (operation: OperationType): number => {
     }
     default: {
       return throwCustomError(
-        new Error("No matching Operation Type"),
+        new Error('No matching Operation Type'),
         methodPath,
         EClassError.USER_ERROR
       )
@@ -154,8 +141,7 @@ export const getMultiplier = (operation: OperationType): number => {
 export const validateAmount = (value: number, originMethodPath: string): number => {
   const methodPath = `${namespace}.validateAmount at ${originMethodPath}`
 
-  if (nullCheck<number>(value, methodPath) >= 0)
-    return value
+  if (nullCheck<number>(value, methodPath) >= 0) { return value }
 
   return throwCustomError(
     new Error("Can't operate negative amount."),
@@ -163,4 +149,3 @@ export const validateAmount = (value: number, originMethodPath: string): number 
     EClassError.USER_ERROR
   )
 }
-

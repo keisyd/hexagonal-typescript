@@ -1,5 +1,4 @@
-import { TransactionStatus, WalletStatus } from "@models"
-import { OperationType, Service } from "./operations"
+import { TransactionStatus, WalletStatus, OperationType, Service } from '@models'
 /**
  * @description The debit object
  * @export
@@ -66,6 +65,3 @@ export type Transaction = {
    */
   readonly status: TransactionStatus
 }
-
-
-

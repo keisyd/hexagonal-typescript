@@ -1,15 +1,13 @@
-import * as todo from './todo.controller'
+import * as transaction from './transaction.controller'
 import * as index from './index.controller'
 
 const controllers = {
   index: {
     ping: index.ping
   },
-  todo: {
-    createTodo: todo.createTodo,
-    deleteTodo: todo.deleteTodo,
-    getTodo: todo.getTodo,
-    updateTodo: todo.updateTodo
+  transaction: {
+    createTransaction: transaction.createTransaction,
+    getTransaction: transaction.getTransaction
   }
 }
 

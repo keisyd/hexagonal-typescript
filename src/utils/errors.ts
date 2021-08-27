@@ -38,25 +38,13 @@ export const throwCustomError = <E extends Error>(error: E, methodPath: string, 
   throw customErrorFactory(error, methodPath, classError)
 }
 
-/**
- * @description Validate null object
- * @function
- * @param {any} [data] input data
- * @param {string} [methodPath] method path
- * @returns {Todo}
- */
-export const nullCheck = <T>(
-  data: any,
-  methodPath: string,
-): T => {
-  if (R.isNil(data)) {
+export const nullCheck = <T>(data: T, methodPath: string): T => {
+  if (R.isEmpty(data) || R.isNil(data)) {
     return throwCustomError(
-      new Error("invalid entry on field data, missing information"),
+      new Error('Invalid entry on field, missing information'),
       methodPath,
       EClassError.USER_ERROR
     )
   }
-
   return data
 }
-

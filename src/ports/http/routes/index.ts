@@ -2,7 +2,7 @@ import { AdapterFacade } from '@adapters'
 import { LoggerInstance } from '@ports/logger'
 import { Router } from 'express'
 import { indexRouter } from './index.router'
-import { todoRouter } from './todo.router'
+import { transactionRouter } from './transaction.router'
 
 /**
  * @description Get route definitions.
@@ -14,6 +14,6 @@ import { todoRouter } from './todo.router'
 export const getRoutes = (logger: LoggerInstance, adapter: AdapterFacade): { readonly [key: string]: Router } => {
   return {
     index: indexRouter(logger),
-    todo: todoRouter(logger, adapter)
+    transaction: transactionRouter(logger, adapter)
   }
 }
