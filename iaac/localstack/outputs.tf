@@ -1,7 +1,7 @@
 # this file is for output members
 
 output "aws_sqs_transaction_queue_url" {
-  value = aws_sqs_queue.transaction_queue.id
+  value = aws_sqs_queue.transactions.id
 }
 
 
