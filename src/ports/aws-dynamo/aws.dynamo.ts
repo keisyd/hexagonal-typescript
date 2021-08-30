@@ -16,13 +16,22 @@ export type DynamoResult<T, U> = {
  */
 export const getDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: string) => async (key: DynamoDB.DocumentClient.Key): Promise<DynamoResult<T | null, DynamoDB.DocumentClient.GetItemOutput>> => {
   try {
-    const params: DynamoDB.DocumentClient.GetItemInput = {
+    const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: tableName,
-      Key: key
+      KeyConditionExpression: 'walletId = :a',
+      ExpressionAttributeValues: {
+        ':a': key.id
+      }
     }
 
-    const operationResult = await dynamo.get(params).promise()
-    const value = R.not(R.isNil(operationResult.Item)) ? { ...operationResult.Item } as T : null
+    const operationResult = await dynamo.query(params).promise()
+
+    const items = R.not(R.isNil(operationResult.Items)) ? operationResult.Items as ReadonlyArray<T> : []
+
+    const lastIndex: number = items.length - 1
+
+    const value = lastIndex >= 0 ? items[lastIndex] as T : null
+
     const requestId = operationResult.$response.requestId
 
     return {
@@ -60,61 +69,6 @@ export const putDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: strin
     }
   } catch (error) {
     return throwCustomError(error, 'ports.aws-dynamo.putDocument', EClassError.INTERNAL)
-  }
-}
-
-/**
- * @description Update document in the DynamoDB.
- * @param {DynamoDB.DocumentClient} dynamo instance of Dynamo SDK for aws (DocumentClient)
- * @param {string} tableName name of table in DynamoDB
- */
-export const updateDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: string) => async (key: DynamoDB.DocumentClient.Key, updateExpression: DynamoDB.DocumentClient.UpdateExpression, expressionAttributeValues: DynamoDB.DocumentClient.ExpressionAttributeValueMap): Promise<DynamoResult<Partial<T>, DynamoDB.DocumentClient.UpdateItemOutput>> => {
-  try {
-    const params = {
-      TableName: tableName,
-      Key: key,
-      UpdateExpression: updateExpression,
-      ExpressionAttributeValues: remapPrefixVariables(expressionAttributeValues),
-      ReturnValues: 'ALL_NEW'
-    }
-
-    const operationResult = await dynamo.update(params).promise()
-    const value = { ...operationResult.Attributes } as Partial<T>
-    const requestId = operationResult.$response.requestId
-
-    return {
-      operationResult,
-      value,
-      requestId
-    }
-  } catch (error) {
-    return throwCustomError(error, 'ports.aws-dynamo.updateDocument', EClassError.INTERNAL)
-  }
-}
-
-/**
- * @description Delete a document on table TableName in the DynamoDB.
- * @param {DynamoDB.DocumentClient} dynamo instance of Dynamo SDK for aws (DocumentClient)
- * @param {string} tableName name of table in DynamoDB
- */
-export const deleteDocument = (dynamo: DynamoDB.DocumentClient, tableName: string) => async (key: DynamoDB.DocumentClient.Key): Promise<DynamoResult<null, DynamoDB.DocumentClient.DeleteItemOutput>> => {
-  try {
-    const params = {
-      TableName: tableName,
-      Key: key
-    }
-
-    const operationResult = await dynamo.delete(params).promise()
-    const value = null
-    const requestId = operationResult.$response.requestId
-
-    return {
-      operationResult,
-      value,
-      requestId
-    }
-  } catch (error) {
-    return throwCustomError(error, 'ports.aws-dynamo.deleteDocument', EClassError.INTERNAL)
   }
 }
 

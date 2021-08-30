@@ -10,7 +10,7 @@ module.exports = {
   coverageAnalysis: 'off',
   maxConcurrentTestRunners: 2,
   dashboard: {
-    project: 'github.com/hex-js/nodejs-hexagonal-boilerplate'
+    project: 'github.com/hex-js/nodejs-balance-operations'
   },
   mutate: [
     'src/**/*.ts',

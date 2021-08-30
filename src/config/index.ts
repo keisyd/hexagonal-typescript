@@ -64,7 +64,7 @@ const envProdName = 'production'
  * @memberof config
  */
 const appConfig = {
-  appName: getEnv('APP_NAME', 'hexagonal-boilerplate'),
+  appName: getEnv('APP_NAME', 'balance-operations'),
   isProduction: getEnv('NODE_ENV') === envProdName,
   envName: getEnv('NODE_ENV', 'development'),
   transaction: {

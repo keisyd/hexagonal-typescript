@@ -17,7 +17,8 @@ module.exports = {
         '@business': './src/business',
         '@config': './src/config',
         '@ports': './src/ports',
-        '@utils': './src/utils'
+        '@utils': './src/utils',
+        '@models': './src/models'
       }
     }]
   ],

@@ -27,7 +27,7 @@ describe('config', () => {
     expect(envProdName).toBe('production')
   })
   test('appConfig', () => {
-    expect(appConfig).toHaveProperty('appName', 'hexagonal-boilerplate')
+    expect(appConfig).toHaveProperty('appName', 'balance-operations')
     expect(appConfig).toHaveProperty('isProduction', false)
     expect(appConfig.isProduction).not.toBeUndefined()
     expect(appConfig.isProduction).not.toBeNull()
