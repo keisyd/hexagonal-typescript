@@ -8,7 +8,17 @@ const controllers = {
   transaction: {
     createTransaction: transaction.createTransaction,
     getTransaction: transaction.getTransaction
+  },
+  transfer: {
+    transfer: transaction.createTransaction
+  },
+  deposit: {
+    deposit: transaction.createTransaction
+  },
+  withdraw: {
+    withdraw: transaction.createTransaction
   }
+
 }
 
 export default controllers

@@ -18,15 +18,17 @@ export const getDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: strin
   try {
     const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: tableName,
-      KeyConditionExpression: 'walletId = :a',
+      KeyConditionExpression: 'walletId = :walletId_value',
       ExpressionAttributeValues: {
-        ':a': key.id
-      }
+        ':walletId_value': key.id
+      },
+      ScanIndexForward: true,
+      Limit: 10 // DataPerReq
     }
 
     const operationResult = await dynamo.query(params).promise()
 
-    const items = R.not(R.isNil(operationResult.Items)) ? operationResult.Items as ReadonlyArray<T> : []
+    const items: ReadonlyArray<T> = R.not(R.isNil(operationResult.Items)) ? operationResult.Items as ReadonlyArray<T> : []
 
     const lastIndex: number = items.length - 1
 

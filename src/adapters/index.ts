@@ -2,6 +2,7 @@ import { DynamoRepositoryInstance } from '@ports/aws-dynamo'
 import { Transaction } from '@models'
 import transactionAdapterFactory, { TransactionAdapterInstance } from './transaction'
 import { LoggerInstance } from '@ports/logger'
+export const root: string = 'adapters'
 
 export type AdapterFacade = {
   readonly transaction: TransactionAdapterInstance

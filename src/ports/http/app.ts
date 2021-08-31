@@ -27,5 +27,8 @@ app.use(expressUrlEncoded({ extended: false }))
 const routes = getRoutes(logger, adapterInstance)
 app.use('/api/v1', routes.index)
 app.use('/api/v1/transactions', routes.transaction)
+app.use('/api/v1/deposit', routes.deposit)
+app.use('/api/v1/withdraw', routes.withdraw)
+app.use('/api/v1/transfer', routes.transfer)
 
 export default app
