@@ -2,10 +2,9 @@ import { root, validateAmount, validateSuccessTransaction } from '@business'
 import { EClassError, nullCheck, throwCustomError } from '@utils'
 import Joi from 'joi'
 import {
-  OperationRequest, OperationType, Service, Transaction, TransactionStatus
+  OperationRequest, OperationType, Transaction, TransactionStatus
 } from '@models'
 import { validateSchema } from './schema'
-import { ServiceRequester } from '@models/service-requester'
 
 const namespace: string = `${root}.credit`
 
@@ -13,9 +12,8 @@ export const creditRequestSchema = Joi.object<OperationRequest>({
   originId: Joi.string().required(),
   destinationId: Joi.string().required(),
   amount: Joi.number().integer().min(0).required(),
-  serviceOrigin: Joi.string().invalid(Service.WITHDRAW).required(),
+  serviceOrigin: Joi.string().invalid('WITHDRAW').required(),
   operation: Joi.string().valid(OperationType.CREDIT).required(),
-  requester: Joi.string().invalid(ServiceRequester.WITHDRAW).required(),
   token: Joi.string().required()
 })
 

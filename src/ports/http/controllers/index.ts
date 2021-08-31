@@ -1,24 +1,17 @@
-import * as transaction from './transaction.controller'
+import * as debit from './debit.controller'
 import * as index from './index.controller'
+import * as credit from './credit.controller'
 
 const controllers = {
   index: {
     ping: index.ping
   },
-  transaction: {
-    createTransaction: transaction.createTransaction,
-    getTransaction: transaction.getTransaction
+  credit: {
+    credit: credit.credit
   },
-  transfer: {
-    transfer: transaction.createTransaction
-  },
-  deposit: {
-    deposit: transaction.createTransaction
-  },
-  withdraw: {
-    withdraw: transaction.createTransaction
+  debit: {
+    debit: debit.debit
   }
-
 }
 
 export default controllers

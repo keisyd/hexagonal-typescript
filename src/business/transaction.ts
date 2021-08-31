@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import {
-  Transaction, OperationType, Service, WalletStatus, TransactionStatus
+  Transaction, OperationType, WalletStatus, TransactionStatus
 } from '@models'
 import { root, validateSchema } from '@business'
 import { EClassError, nullCheck, throwCustomError } from '@utils'
@@ -17,7 +17,7 @@ const transactionSchema = Joi.object<Transaction>({
   amountTransacted: Joi.number().integer().min(0).required(),
   amount: Joi.number().integer().min(0).required(),
   operation: Joi.string().valid(...Object.values(OperationType)).required(),
-  serviceOrigin: Joi.string().valid(...Object.values(Service)).required(),
+  serviceOrigin: Joi.string().required(),
   walletStatus: Joi.string().valid(...Object.values(WalletStatus)).required(),
   status: Joi.string().valid(...Object.values(TransactionStatus)).required()
 })

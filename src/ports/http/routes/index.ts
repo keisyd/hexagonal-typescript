@@ -2,7 +2,8 @@ import { AdapterFacade } from '@adapters'
 import { LoggerInstance } from '@ports/logger'
 import { Router } from 'express'
 import { indexRouter } from './index.router'
-import { transactionRouter } from './transaction.router'
+import { debitRouter } from './debit.router'
+import { creditRouter } from './credit.router'
 
 /**
  * @description Get route definitions.
@@ -14,6 +15,7 @@ import { transactionRouter } from './transaction.router'
 export const getRoutes = (logger: LoggerInstance, adapter: AdapterFacade): { readonly [key: string]: Router } => {
   return {
     index: indexRouter(logger),
-    transaction: transactionRouter(logger, adapter)
+    debit: debitRouter(logger, adapter),
+    credit: creditRouter(logger, adapter)
   }
 }

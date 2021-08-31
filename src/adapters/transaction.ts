@@ -9,7 +9,7 @@ import { root } from '@adapters'
 
 export type TransactionAdapterInstance = {
   readonly getTransaction: (walletId: string) => Promise<Transaction | null>
-  readonly createTransaction: (params: Transaction) => Promise<Transaction>
+  readonly insertTransaction: (params: Transaction) => Promise<Transaction>
 }
 
 const namespace: string = `${root}.transaction`
@@ -26,7 +26,7 @@ const transactionAdapterFactory = (
   repository: DynamoRepositoryInstance<Transaction>
 ): TransactionAdapterInstance => ({
   getTransaction: getTransaction(repository),
-  createTransaction: createTransaction(logger, repository)
+  insertTransaction: insertTransaction(logger, repository)
 })
 
 export default transactionAdapterFactory
@@ -41,7 +41,7 @@ const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => as
 ) => {
   const methodPath = `${namespace}.getTransaction`
   try {
-    const result = await repository.getLastTransaction({ walletId })
+    const result = await repository.getLastTransaction({ id: walletId })
     return result.value
   } catch (error) {
     return throwCustomError(error, methodPath, EClassError.INTERNAL)
@@ -54,11 +54,11 @@ const getTransaction = (repository: DynamoRepositoryInstance<Transaction>) => as
  * @param {LoggerInstance} logger instance of logger
  * @param {DynamoRepositoryInstance<Transaction>} repository Dynamo database methods
  */
-const createTransaction = (
+const insertTransaction = (
   logger: LoggerInstance,
   repository: DynamoRepositoryInstance<Transaction>
 ) => async (params: Transaction) => {
-  const methodPath = `${namespace}.createTransaction`
+  const methodPath = `${namespace}.insertTransaction`
 
   try {
     const result = await repository.putDocument(

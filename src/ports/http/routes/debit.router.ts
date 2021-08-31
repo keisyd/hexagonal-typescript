@@ -7,7 +7,7 @@ import controllers from '@ports/http/controllers'
 const router = Router()
 
 /**
- * @description Define the transfer routes.
+ * @description Define the debit routes.
  *
  * @function
  * @param {LoggerInstance} logger instance of logger
@@ -15,11 +15,11 @@ const router = Router()
  * @returns {Router}
  */
 
-export const transferRouter = (logger: LoggerInstance, adapter: AdapterFacade): Router => {
+export const debitRouter = (logger: LoggerInstance, adapter: AdapterFacade): Router => {
   /**
-   * Transfer money from origin Wallet to destination wallet
+   * Create a debit transaction to the destination Wallet
    */
-  router.post('/', (req, res) => response(controllers.transfer.transfer(logger, adapter)(req), res))
+  router.post('/', (req, res) => response(controllers.debit.debit(logger, adapter)(req), res))
 
   return router
 }

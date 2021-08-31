@@ -1,5 +1,4 @@
-import { OperationType, Service } from '@models'
-import { ServiceRequester } from './service-requester'
+import { OperationType } from '@models'
 
 /**
  * @description The final user Transfer
@@ -27,17 +26,12 @@ export type OperationRequest = {
    * @description
    * Serviço UUDI que dá origem (justificativa) para a transação
    */
-  readonly serviceOrigin: Service
+  readonly serviceOrigin: string
   /**
    * @description
    * Tipo de operação atômica crédito ou débito
    */
   readonly operation: OperationType
-  /**
-   * @description
-   * Tipo de operação atômica crédito ou débito
-   */
-  readonly requester: ServiceRequester
   /**
     * @description
     * Tipo de operação atômica crédito ou débito

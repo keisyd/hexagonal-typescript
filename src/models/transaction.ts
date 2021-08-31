@@ -1,4 +1,4 @@
-import { TransactionStatus, WalletStatus, OperationType, Service } from '@models'
+import { TransactionStatus, WalletStatus, OperationType } from '@models'
 /**
  * @description The debit object
  * @export
@@ -56,7 +56,7 @@ export type Transaction = {
    * @description
    * Serviço que deu origem à operação
    */
-  readonly serviceOrigin: Service
+  readonly serviceOrigin: string
   /**
    * @description
    * Status da transação,

@@ -14,7 +14,7 @@ export type DynamoResult<T, U> = {
  * @param {DynamoDB.DocumentClient} dynamo instance of Dynamo SDK for aws (DocumentClient)
  * @param {string} tableName name of table in DynamoDB
  */
-export const getDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: string) => async (key: DynamoDB.DocumentClient.Key): Promise<DynamoResult<T | null, DynamoDB.DocumentClient.GetItemOutput>> => {
+export const getLastInserted = <T>(dynamo: DynamoDB.DocumentClient, tableName: string) => async (key: DynamoDB.DocumentClient.Key): Promise<DynamoResult<T | null, DynamoDB.DocumentClient.GetItemOutput>> => {
   try {
     const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: tableName,
@@ -22,7 +22,7 @@ export const getDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: strin
       ExpressionAttributeValues: {
         ':walletId_value': key.id
       },
-      ScanIndexForward: true,
+      ScanIndexForward: false,
       Limit: 10 // DataPerReq
     }
 
@@ -30,9 +30,7 @@ export const getDocument = <T>(dynamo: DynamoDB.DocumentClient, tableName: strin
 
     const items: ReadonlyArray<T> = R.not(R.isNil(operationResult.Items)) ? operationResult.Items as ReadonlyArray<T> : []
 
-    const lastIndex: number = items.length - 1
-
-    const value = lastIndex >= 0 ? items[lastIndex] as T : null
+    const value = items.length >= 0 ? items[0] as T : null
 
     const requestId = operationResult.$response.requestId
 

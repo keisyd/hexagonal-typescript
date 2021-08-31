@@ -1,5 +1,6 @@
 import { createDebitTransaction, debit } from '@business'
 import * as m from '@models'
+import moment from 'moment'
 
 describe('debit', () => {
   const greater: number = 3
@@ -43,14 +44,14 @@ describe('createDebitTransaction', () => {
   const transactionAmount: number = 20
   const token: string = '80d1e421-ce45-457f-cc43-ce54f18c374a'
   const lastTime: string = '2020-06-01T12:00:00Z'
-  const transactionTime: string = '2020-06-01T12:00:00Z'
+  const transactionTime: string = moment.now().toString()
 
   const lastTransaction: m.Transaction = {
     walletId: walletId,
     destinationId: walletId,
     originId: uudiDefaultToken,
     operation: m.OperationType.DEBIT,
-    serviceOrigin: m.Service.DEPOSIT,
+    serviceOrigin: 'DEPOSIT',
     status: m.TransactionStatus.SUCCESS,
     amount: currentAmount,
     previousAmount: 0,
@@ -64,9 +65,8 @@ describe('createDebitTransaction', () => {
       originId: walletId,
       destinationId: uudiDefaultToken,
       amount: transactionAmount,
-      serviceOrigin: m.Service.WITHDRAW,
+      serviceOrigin: 'WITHDRAW',
       operation: m.OperationType.DEBIT,
-      requester: m.ServiceRequester.CORE,
       token: token
     }
 
@@ -94,9 +94,8 @@ describe('createDebitTransaction', () => {
       originId: walletId,
       destinationId: random,
       amount: transactionAmount,
-      serviceOrigin: m.Service.WITHDRAW,
+      serviceOrigin: 'WITHDRAW',
       operation: m.OperationType.DEBIT,
-      requester: m.ServiceRequester.CORE,
       token: token
     }
 
@@ -112,9 +111,8 @@ describe('createDebitTransaction', () => {
       originId: walletId,
       destinationId: random,
       amount: transactionAmount + currentAmount,
-      serviceOrigin: m.Service.WITHDRAW,
+      serviceOrigin: 'WITHDRAW',
       operation: m.OperationType.DEBIT,
-      requester: m.ServiceRequester.CORE,
       token: token
     }
 
@@ -130,9 +128,8 @@ describe('createDebitTransaction', () => {
       originId: walletId,
       destinationId: random,
       amount: transactionAmount + currentAmount,
-      serviceOrigin: m.Service.WITHDRAW,
+      serviceOrigin: 'WITHDRAW',
       operation: m.OperationType.DEBIT,
-      requester: m.ServiceRequester.CORE,
       token: token
     }
 
@@ -148,9 +145,8 @@ describe('createDebitTransaction', () => {
       originId: random,
       destinationId: walletId,
       amount: transactionAmount,
-      serviceOrigin: m.Service.WITHDRAW,
+      serviceOrigin: 'WITHDRAW',
       operation: m.OperationType.DEBIT,
-      requester: m.ServiceRequester.CORE,
       token: token
     }
 
