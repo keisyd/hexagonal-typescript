@@ -26,8 +26,13 @@ app.use(expressUrlEncoded({ extended: false }))
 
 // Routes
 const routes = getRoutes(logger, adapterInstance)
-app.use('/api/v1', routes.index)
-app.use('/api/v1/credit', routes.credit)
-app.use('/api/v1/debit', routes.debit)
 
+const version = 'v1'
+
+const startPoint: string = '/api/' + version
+
+app.use(startPoint, routes.index)
+app.use(`${startPoint}/credit`, routes.credit)
+app.use(`${startPoint}/debit`, routes.debit)
+app.use(`${startPoint}/register`, routes.register)
 export default app

@@ -21,7 +21,7 @@ export type OperationRequest = {
    * @description
    * Valor transacionado
    */
-  readonly amount: number
+  readonly amount: number /// TODO: Create a validation for this amount never be zero or negative
   /**
    * @description
    * Serviço UUDI que dá origem (justificativa) para a transação

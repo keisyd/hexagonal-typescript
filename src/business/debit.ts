@@ -70,7 +70,7 @@ export const validateDebitRequest = (
   const data: OperationRequest = nullCheck<OperationRequest>(operationRequest, methodPath)
 
   if (data.originId === lastTransaction.walletId) {
-    if (data.amount < lastTransaction.amount) { return validateSchema<OperationRequest>(data, debitRequestSchema.validate(data), methodPath) }
+    if (data.amount <= lastTransaction.amount) { return validateSchema<OperationRequest>(data, debitRequestSchema.validate(data), methodPath) }
 
     return throwCustomError(
       new Error('Insuficient Funds'),
@@ -100,10 +100,12 @@ export const debit = (
 ): number => {
   const methodPath = `${namespace}.debit`
 
-  if (validateAmount(currentAmount, methodPath) > validateAmount(transactionAmount, methodPath)) { return (currentAmount - transactionAmount) }
+  if (validateAmount(currentAmount, methodPath) >= validateAmount(transactionAmount, methodPath)) {
+    return (currentAmount - transactionAmount)
+  }
 
   return throwCustomError(
-    new Error("Can't debit. The currentAmount must be greater than transactionAmount"),
+    new Error("Can't debit. The currentAmount must be greater than transactionAmount " + currentAmount + ' ' + transactionAmount),
     methodPath,
     EClassError.USER_ERROR
   )

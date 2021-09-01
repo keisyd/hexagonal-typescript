@@ -4,6 +4,7 @@ import { Router } from 'express'
 import { indexRouter } from './index.router'
 import { debitRouter } from './debit.router'
 import { creditRouter } from './credit.router'
+import { registerRouter } from './register.router'
 
 /**
  * @description Get route definitions.
@@ -16,6 +17,7 @@ export const getRoutes = (logger: LoggerInstance, adapter: AdapterFacade): { rea
   return {
     index: indexRouter(logger),
     debit: debitRouter(logger, adapter),
-    credit: creditRouter(logger, adapter)
+    credit: creditRouter(logger, adapter),
+    register: registerRouter(logger, adapter)
   }
 }

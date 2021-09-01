@@ -54,6 +54,7 @@ export const createCreditTransaction = (
   operationRequest: OperationRequest,
   lastTransaction: Transaction,
   time: string
+  // !TODO esse tempo precisa ser validado juridicamente?
 ): Transaction => {
   const methodPath = `${namespace}.createCreditTransaction`
 

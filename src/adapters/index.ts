@@ -4,6 +4,7 @@ import transactionAdapterFactory, { TransactionAdapterInstance } from './transac
 import { LoggerInstance } from '@ports/logger'
 import creditAdapterFactory, { CreditAdapterInstance } from './credit'
 import debitAdapterFactory, { DebitAdapterInstance } from './debit'
+import registerAdapterFactory, { RegisterAdapterInstance } from './register'
 export const root: string = 'adapters'
 
 export type AdapterFacadeTransaction = {
@@ -13,6 +14,7 @@ export type AdapterFacadeTransaction = {
 export type AdapterFacade = {
   readonly debit: DebitAdapterInstance
   readonly credit: CreditAdapterInstance
+  readonly register: RegisterAdapterInstance
 }
 
 /**
@@ -34,5 +36,6 @@ export const transactionAdapter = (logger: LoggerInstance, repository: DynamoRep
  */
 export const adapter = (adapter: AdapterFacadeTransaction): AdapterFacade => ({
   credit: creditAdapterFactory(adapter),
-  debit: debitAdapterFactory(adapter)
+  debit: debitAdapterFactory(adapter),
+  register: registerAdapterFactory(adapter)
 })

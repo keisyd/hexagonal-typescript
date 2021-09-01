@@ -31,6 +31,7 @@ const transactionSchema = Joi.object<Transaction>({
 export const validateTransaction = (transaction: Transaction, originMethodPath: string): Transaction => {
   switch (validateTransactionSchema(transaction, originMethodPath).status) {
     case TransactionStatus.SUCCESS: {
+      if (transaction.operation === OperationType.REGISTER) { return validateRegisterTransaction(transaction, originMethodPath) }
       return validateSuccessTransaction(transaction, originMethodPath)
     }
     case TransactionStatus.FAIL: {
@@ -54,7 +55,9 @@ export const validateTransactionSchema = (
   const vtransaction: Transaction = nullCheck<Transaction>(transaction, methodPath)
 
   /// transaction: Make time comparission to be sure that current operation time is greater than the last one
-  if (isValidEntry(vtransaction.transactionTime)) { return validateSchema<Transaction>(vtransaction, transactionSchema.validate(vtransaction), methodPath) }
+  if (isValidEntry(vtransaction.transactionTime)) {
+    return validateSchema<Transaction>(vtransaction, transactionSchema.validate(vtransaction), methodPath)
+  }
 
   return throwCustomError(
     new Error('Date has to be unique, formated and in greater than the past.'),
@@ -145,6 +148,29 @@ export const validateAmount = (value: number, originMethodPath: string): number 
 
   return throwCustomError(
     new Error("Can't operate negative amount."),
+    methodPath,
+    EClassError.USER_ERROR
+  )
+}
+
+/**
+ * @description Validate a unsucessfull transaction
+ * where the amount === previousAmount
+ * @function
+ * @param {Transaction} [transaction] input data for create task
+ * @returns {voTransactionid}
+ */
+export const validateRegisterTransaction = (transaction: Transaction, originMethodPath: string): Transaction => {
+  const methodPath = `${namespace}.validateRegisterTransaction at ${originMethodPath}`
+
+  const vtransaction: Transaction = validateTransactionSchema(nullCheck(transaction, methodPath), originMethodPath)
+
+  if (vtransaction.amount === 0 && vtransaction.previousAmount === 0 && vtransaction.amountTransacted === 0) {
+    return vtransaction
+  }
+
+  return throwCustomError(
+    new Error('Invalid register transaction. Must respect amount === previousAmount === amountTransacted === 0'),
     methodPath,
     EClassError.USER_ERROR
   )

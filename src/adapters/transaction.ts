@@ -64,7 +64,7 @@ const insertTransaction = (
     const result = await repository.putDocument(
       validateTransaction(params, methodPath)
     )
-
+    // analisar o log no mesmo formato do log4net ...
     logger.info(methodPath, {
       action: 'TASK_CREATED',
       method: methodPath,

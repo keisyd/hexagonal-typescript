@@ -13,4 +13,9 @@ export enum OperationType {
    * Operação de adição de capital
    */
   CREDIT = 'CREDIT',
+  /***
+   * @description
+   * Operaçãoi de criação de uma nova wallet
+   */
+  REGISTER = 'REGISTER'
 }
