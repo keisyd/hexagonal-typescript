@@ -1,4 +1,9 @@
 module.exports = {
+  overrides: [
+    { test: /\.js$/, presets: common },
+    { test: /\.ts$/, presets: [...common, "@babel/typescript"] },
+    { test: /\.tsx$/, presets: [...common, "@babel/typescript", "@babel/react"] }
+  ],
   presets: [
     [
       '@babel/preset-env',

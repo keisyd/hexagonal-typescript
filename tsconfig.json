@@ -33,12 +33,8 @@
     "paths": {
       "@business": ["./src/business/index.ts"],
       "@business/*": ["./src/business/*"],
-      "@config": ["./src/config/index.ts"],
-      "@config/*": ["./src/config/*"],
       "@models": ["./src/models/index.ts"],
-      "@models/*": ["./src/models/*"],
-      "@utils": ["./src/utils/index.ts"],
-      "@utils/*": ["./src/utils/*"]
+      "@models/*": ["./src/models/*"]
     }
   },
   "include": [
