@@ -14,7 +14,7 @@ describe('debit', () => {
   test('Negative currentAmount', () => {
     try {
       debit(negative, positive)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't operate negative amount.")
     }
   })
@@ -22,7 +22,7 @@ describe('debit', () => {
   test('Negative transactionAmount', () => {
     try {
       debit(positive, negative)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't operate negative amount.")
     }
   })
@@ -30,7 +30,7 @@ describe('debit', () => {
   test('transactionAmount > currentAmount', () => {
     try {
       debit(positive, greater)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't debit. The currentAmount must be greater than transactionAmount")
     }
   })
@@ -101,7 +101,7 @@ describe('createDebitTransaction', () => {
 
     try {
       createDebitTransaction(data, lastTransaction, transactionTime)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Inconsistent Debit Request. originId must match walletId of the last transaction')
     }
   })
@@ -118,7 +118,7 @@ describe('createDebitTransaction', () => {
 
     try {
       createDebitTransaction(data, lastTransaction, transactionTime)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Insuficient Funds')
     }
   })
@@ -135,7 +135,7 @@ describe('createDebitTransaction', () => {
 
     try {
       createDebitTransaction(data, lastTransaction, transactionTime)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Insuficient Funds')
     }
   })
@@ -152,7 +152,7 @@ describe('createDebitTransaction', () => {
 
     try {
       createDebitTransaction(data, lastTransaction, transactionTime)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Inconsistent Debit Request. originId must match walletId of the last transaction')
     }
   })

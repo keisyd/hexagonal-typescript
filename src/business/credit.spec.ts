@@ -13,7 +13,7 @@ describe('credit', () => {
   test('negative currentAmount', () => {
     try {
       credit(negative, positve)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't operate negative amount.")
     }
   })
@@ -21,7 +21,7 @@ describe('credit', () => {
   test('negative transactionAmount', () => {
     try {
       credit(positve, negative)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't operate negative amount.")
     }
   })
@@ -91,7 +91,7 @@ describe('createCreditTransaction', () => {
 
     try {
       createCreditTransaction(data, lastTransaction, transactionTime)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Inconsistent Credit Request. The destinationId must match walletId of the last transaction')
     }
   })

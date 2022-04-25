@@ -14,7 +14,7 @@ describe('validateAmount', () => {
   test('negative currentAmount', () => {
     try {
       validateAmount(negative, methodPath)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe("Can't operate negative amount.")
     }
   })
@@ -37,7 +37,7 @@ describe('getMultiplier', () => {
   test('Any unexpected value', () => {
     try {
       getMultiplier(op)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('No matching Operation Type')
     }
   })
@@ -94,7 +94,7 @@ describe('validateFailTransaction', () => {
   test('Unexpected credit', () => {
     try {
       validateFailTransaction(utransaction, methodPath)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Invalid failed transaction. Must respect amount === previousAmount')
     }
   })
@@ -141,7 +141,7 @@ describe('validateSuccessTransaction', () => {
   test('Unexpected credit', () => {
     try {
       validateSuccessTransaction(utransaction, methodPath)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Invalid sucessfull transaction. Must respect amount = previousAmount + (operationType)*amountTransacted ')
     }
   })
@@ -184,7 +184,7 @@ describe('validateTransactionSchema', () => {
   test('Unexpected credit', () => {
     try {
       validateTransactionSchema(utransaction, methodPath)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Date has to be unique, formated and in greater than the past.')
     }
   })
@@ -210,7 +210,7 @@ describe('validateTransaction', () => {
   test('Unexpected status', () => {
     try {
       validateTransaction(transaction, methodPath)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('"status" must be one of [SUCCESS, FAIL]')
     }
   })

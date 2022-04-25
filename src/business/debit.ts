@@ -1,10 +1,9 @@
 import { root, validateAmount, validateSuccessTransaction } from '@business'
-import { EClassError, nullCheck, throwCustomError } from '@utils'
+import { EClassError, nullCheck, throwCustomError, validateSchema } from '@utils'
 import Joi from 'joi'
 import {
   OperationRequest, OperationType, Transaction, TransactionStatus
 } from '@models'
-import { validateSchema } from './schema'
 
 const namespace: string = `${root}.debit`
 

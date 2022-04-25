@@ -1,8 +1,0 @@
-.circleci
-.github
-.vscode
-node_modules
-dist
-logs
-*.log
-.env*

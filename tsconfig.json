@@ -31,16 +31,12 @@
     "forceConsistentCasingInFileNames": true,
     "preserveConstEnums": true,
     "paths": {
-      "@adapters": ["./src/adapters/index.ts"],
-      "@adapters/*": ["./src/adapters/*"],
       "@business": ["./src/business/index.ts"],
       "@business/*": ["./src/business/*"],
       "@config": ["./src/config/index.ts"],
       "@config/*": ["./src/config/*"],
       "@models": ["./src/models/index.ts"],
       "@models/*": ["./src/models/*"],
-      "@ports": ["./src/ports/index.ts"],
-      "@ports/*": ["./src/ports/*"],
       "@utils": ["./src/utils/index.ts"],
       "@utils/*": ["./src/utils/*"]
     }
